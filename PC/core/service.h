@@ -233,14 +233,6 @@ public:
       return false;
     }
 #else
-    bool tunnelOk = ensureWireGuardWindows(resolvedConf);
-    if (!tunnelOk) {
-      outErr = "Falha ao ativar o driver WFP do WireSock (wiresock-client nao permaneceu ativo).";
-      addLog(outErr, 3);
-      return false;
-    }
-    notify("WireSock WFP ativado com sucesso!");
-
     std::wstring exe = locateDiscordExe();
     if (exe.empty()) {
       outErr = "Executável do Discord não encontrado.";
@@ -248,24 +240,65 @@ public:
       return false;
     }
 
-    bool launched = launchDiscord(exe);
-    if (!launched) {
-      outErr = "Falha ao lançar o Discord.";
-      addLog(outErr, 3);
-      return false;
-    }
+    // Ordem obrigatoria: WireSock ESTAVEL antes do Discord.
+    // Se o client morrer ao abrir o Discord (AV/WFP), fecha o Discord,
+    // sobe o tunel de novo e so entao reabre o Discord.
+    bool launched = false;
+    for (int attempt = 1; attempt <= 3; ++attempt) {
+      if (attempt > 1) {
+        notify("Tentativa " + std::to_string(attempt) + "/3: garantindo WireSock antes do Discord...");
+        killDiscord();
+        _wsystem(L"taskkill /F /IM wiresock-client.exe >nul 2>&1");
+        std::this_thread::sleep_for(std::chrono::milliseconds(800));
+      }
 
-    // Em alguns PCs (AV / isolamento) o wiresock-client morre ao abrir o Discord.
-    // Revalida e reinsere o tunel sem fechar o Discord.
-    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
-    if (!isWireSockRunning()) {
-      notify("WireSock caiu ao abrir o Discord — reiniciando tunel...");
-      if (!ensureWireSockClientAlive()) {
-        outErr = "WireSock foi encerrado ao abrir o Discord (possivel antivirus). Tente exclusao no Defender.";
+      bool tunnelOk = ensureWireGuardWindows(resolvedConf);
+      if (!tunnelOk) {
+        outErr = "Falha ao ativar o driver WFP do WireSock (wiresock-client nao permaneceu ativo).";
+        addLog(outErr, 3);
+        if (attempt == 3)
+          return false;
+        continue;
+      }
+      notify("WireSock WFP ativado com sucesso!");
+
+      // Espera extra para o handshake estabilizar ANTES de abrir o Discord
+      std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+      if (!isWireSockRunning()) {
+        addLog("WireSock caiu antes de abrir o Discord.", 2);
+        if (attempt == 3) {
+          outErr = "WireSock nao permanece ativo (possivel antivirus bloqueando wiresock-client).";
+          return false;
+        }
+        continue;
+      }
+
+      launched = launchDiscord(exe);
+      if (!launched) {
+        outErr = "Falha ao lançar o Discord.";
         addLog(outErr, 3);
         return false;
       }
-      addLog("WireSock reiniciado com sucesso apos o Discord abrir.", 1);
+
+      // Confirma que o tunel sobreviveu a abertura do Discord
+      std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+      if (isWireSockRunning())
+        break;
+
+      addLog("WireSock morreu ao abrir o Discord — fechando Discord e subindo o tunel de novo (antes de reabrir).", 2);
+      killDiscord();
+      launched = false;
+      if (attempt == 3) {
+        outErr = "WireSock e encerrado ao abrir o Discord (antivirus/isolamento). Adicione exclusao no Defender para wiresock-client.exe e Perseus_gui.exe.";
+        addLog(outErr, 3);
+        return false;
+      }
+    }
+
+    if (!launched || !isWireSockRunning()) {
+      outErr = "Nao foi possivel manter WireSock ativo antes/durante a abertura do Discord.";
+      addLog(outErr, 3);
+      return false;
     }
 #endif
 
