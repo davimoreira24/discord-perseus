@@ -49,7 +49,7 @@ AppWindow::AppWindow() {
   m_status = Core::Service::instance().queryStatus();
   m_lastProbe = std::chrono::steady_clock::now();
 
-  if (fs::is_regular_file("ardc_vpn.conf")) {
+  if (Core::Service::instance().hasLocalConfigFile()) {
     m_configMode = 0;
   }
 }
@@ -93,7 +93,9 @@ void AppWindow::render() {
   // Polling de status periódico (a cada 2 segundos) sem travar a interface
   auto now = std::chrono::steady_clock::now();
   if (!m_isWorking && std::chrono::duration_cast<std::chrono::seconds>(now - m_lastProbe).count() >= 2) {
-    std::string conf = (m_configMode == 1 && m_customPathBuf[0] != '\0') ? m_customPathBuf : "ardc_vpn.conf";
+    std::string conf = (m_configMode == 1 && m_customPathBuf[0] != '\0')
+                           ? std::string(m_customPathBuf)
+                           : Core::Service::instance().defaultConfigPath();
     m_status = Core::Service::instance().queryStatus(conf);
     m_lastProbe = now;
   }
@@ -510,10 +512,10 @@ void AppWindow::renderConfigTab() {
   ImGui::Separator();
   ImGui::Spacing();
 
-  bool hasConf = fs::is_regular_file("ardc_vpn.conf");
+  bool hasConf = Core::Service::instance().hasLocalConfigFile();
   bool hasSess = Core::Service::instance().hasSavedSession();
 
-  ImGui::TextColored(th.textSecondary, "Perfil WireGuard Local (ardc_vpn.conf):");
+  ImGui::TextColored(th.textSecondary, "Perfil WireGuard Local:");
   ImGui::SameLine(340.0f);
   if (hasConf) ImGui::TextColored(th.terminalGreen, "Presente no disco");
   else ImGui::TextColored(th.textMuted, "Ausente");
@@ -975,7 +977,8 @@ bool AppWindow::hasValidConfig() const {
   if (m_configMode == 1) {
     return (m_customPathBuf[0] != '\0' && fs::is_regular_file(m_customPathBuf));
   }
-  return (fs::is_regular_file("ardc_vpn.conf") || Core::Service::instance().hasSavedSession());
+  return (Core::Service::instance().hasLocalConfigFile() ||
+          Core::Service::instance().hasSavedSession());
 }
 
 void AppWindow::openBrowser(const std::string &url) {
@@ -1148,7 +1151,9 @@ void AppWindow::triggerStart() {
   m_isStopping = false;
   m_workMessage = "Inicializando isolamento de rede...";
 
-  std::string chosenConf = (m_configMode == 1 && m_customPathBuf[0] != '\0') ? m_customPathBuf : "ardc_vpn.conf";
+  std::string chosenConf = (m_configMode == 1 && m_customPathBuf[0] != '\0')
+                               ? std::string(m_customPathBuf)
+                               : Core::Service::instance().defaultConfigPath();
 
   m_future = std::async(std::launch::async, [this, chosenConf]() {
     Core::Service::instance().addLog("[ ⠋ ] Preparando túnel WireGuard dedicado e isolamento de rede...", 0);
@@ -1218,7 +1223,7 @@ void AppWindow::triggerProtonLogin() {
     if (!ok) {
       m_authError = !err.empty() ? err : "Falha na autenticação ou timeout da API Proton.";
       Core::Service::instance().addLog(m_authError, 3);
-      m_status = Core::Service::instance().queryStatus("ardc_vpn.conf");
+      m_status = Core::Service::instance().queryStatus(Core::Service::instance().defaultConfigPath());
       return;
     }
 
@@ -1228,7 +1233,7 @@ void AppWindow::triggerProtonLogin() {
     Core::Service::instance().addLog("[ ✔ ] Perfil ProtonVPN configurado com sucesso!", 1);
     std::this_thread::sleep_for(std::chrono::milliseconds(800));
 
-    m_status = Core::Service::instance().queryStatus("ardc_vpn.conf");
+    m_status = Core::Service::instance().queryStatus(Core::Service::instance().defaultConfigPath());
     m_authSuccess = false;
     m_isAuthWorking = false;
     m_isWorking = false;
@@ -1265,7 +1270,7 @@ void AppWindow::triggerProtonLoginAndStart() {
     if (!ok) {
       m_authError = !err.empty() ? err : "Falha na autenticação ou timeout da API Proton.";
       Core::Service::instance().addLog(m_authError, 3);
-      m_status = Core::Service::instance().queryStatus("ardc_vpn.conf");
+      m_status = Core::Service::instance().queryStatus(Core::Service::instance().defaultConfigPath());
       return;
     }
 
@@ -1286,7 +1291,7 @@ void AppWindow::triggerProtonLoginAndStart() {
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     Core::Service::instance().addLog("[ ⠙ ] Estabelecendo handshake com servidor internacional...", 0);
 
-    bool startOk = Core::Service::instance().startBypass("ardc_vpn.conf", err, [this](const std::string &msg) {
+    bool startOk = Core::Service::instance().startBypass(Core::Service::instance().defaultConfigPath(), err, [this](const std::string &msg) {
       m_workMessage = msg;
     });
     if (!startOk && !err.empty()) {
@@ -1295,7 +1300,7 @@ void AppWindow::triggerProtonLoginAndStart() {
       Core::Service::instance().addLog("[ ✔ ] Túnel conectado! Discord liberado para Transmissão e Câmera.", 1);
     }
 
-    m_status = Core::Service::instance().queryStatus("ardc_vpn.conf");
+    m_status = Core::Service::instance().queryStatus(Core::Service::instance().defaultConfigPath());
     m_isConnecting = false;
     m_isWorking = false;
   });

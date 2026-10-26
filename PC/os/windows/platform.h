@@ -350,39 +350,80 @@ inline std::wstring findProtonConfgenExe() {
 }
 
 inline std::string getVpnConfigPath() {
+  wchar_t localApp[MAX_PATH];
+  fs::path preferred;
+  if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
+    preferred = fs::path(localApp) / "Perseus" / "ardc_vpn.conf";
+    if (fs::is_regular_file(preferred))
+      return preferred.string();
+  }
+
+  // Migracao: conf antigo relativo ao CWD ou ao lado do .exe
   if (fs::is_regular_file("ardc_vpn.conf")) {
+    std::error_code ec;
+    fs::path abs = fs::absolute("ardc_vpn.conf", ec);
+    if (!ec)
+      return abs.string();
     return "ardc_vpn.conf";
   }
+
   wchar_t modulePath[MAX_PATH];
   if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH) != 0) {
-    fs::path appDir = fs::path(modulePath).parent_path();
-    fs::path appConf = appDir / "ardc_vpn.conf";
-    if (fs::is_regular_file(appConf)) return appConf.string();
+    fs::path appConf = fs::path(modulePath).parent_path() / "ardc_vpn.conf";
+    if (fs::is_regular_file(appConf))
+      return appConf.string();
   }
-  wchar_t localApp[MAX_PATH];
-  if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
-    fs::path localConf = fs::path(localApp) / "Perseus" / "ardc_vpn.conf";
-    if (fs::is_regular_file(localConf)) return localConf.string();
-  }
-  if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH) != 0) {
-    fs::path appDir = fs::path(modulePath).parent_path();
-    try {
-      fs::path testFile = appDir / ".ar_perm_test";
-      std::ofstream test(testFile);
-      if (test.is_open()) {
-        test.close();
-        fs::remove(testFile);
-        return (appDir / "ardc_vpn.conf").string();
-      }
-    } catch (...) {}
-  }
-  if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
-    fs::path dir = fs::path(localApp) / "Perseus";
+
+  // Novo padrao estavel: %LOCALAPPDATA%\Perseus\ardc_vpn.conf
+  if (!preferred.empty()) {
     std::error_code ec;
-    fs::create_directories(dir, ec);
-    return (dir / "ardc_vpn.conf").string();
+    fs::create_directories(preferred.parent_path(), ec);
+    return preferred.string();
   }
   return "ardc_vpn.conf";
+}
+
+inline std::string resolveVpnConfigPath(const std::string &chosenConf) {
+  if (chosenConf.empty() || chosenConf == "ardc_vpn.conf")
+    return getVpnConfigPath();
+  return chosenConf;
+}
+
+inline bool startWireSockClientProcess(const std::wstring &wsExe, const fs::path &confPath) {
+  std::wstring cmd = L"\"" + wsExe + L"\" run -config \"" + confPath.wstring() + L"\" -log-level none";
+
+  STARTUPINFOW si;
+  ZeroMemory(&si, sizeof(si));
+  si.cb = sizeof(si);
+  si.dwFlags = STARTF_USESHOWWINDOW;
+  si.wShowWindow = SW_HIDE;
+
+  PROCESS_INFORMATION pi;
+  ZeroMemory(&pi, sizeof(pi));
+
+  std::vector<wchar_t> cmdBuf(cmd.begin(), cmd.end());
+  cmdBuf.push_back(L'\0');
+
+  // CREATE_NEW_CONSOLE + SW_HIDE: wiresock-client e app console; CREATE_NO_WINDOW|DETACHED
+  // faz o processo subir ~2s e sair (badge DESCONECTADO). Console oculto mantem vivo.
+  BOOL ok = CreateProcessW(
+      nullptr, cmdBuf.data(), nullptr, nullptr, FALSE,
+      CREATE_NEW_CONSOLE, nullptr, nullptr, &si, &pi);
+
+  if (!ok)
+    return false;
+
+  CloseHandle(pi.hProcess);
+  CloseHandle(pi.hThread);
+
+  for (int i = 0; i < 12; ++i) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    if (isWireSockRunning()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(900));
+      return isWireSockRunning();
+    }
+  }
+  return false;
 }
 
 inline bool setupProtonConfigWindows(
@@ -618,56 +659,51 @@ inline bool ensureWireGuardWindows(const std::string &chosenConf = "") {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 
-  std::string targetConf = chosenConf.empty() ? getVpnConfigPath() : chosenConf;
+  std::string targetConf = resolveVpnConfigPath(chosenConf);
+  const bool usingDefaultProfile =
+      chosenConf.empty() || chosenConf == "ardc_vpn.conf" ||
+      fs::path(targetConf).filename() == "ardc_vpn.conf";
 
-  // Se o arquivo não existir e não for customizado, tenta setupProtonConfigWindows()
+  // Se o arquivo não existir e for o perfil padrao, tenta gerar via Proton
   if (!fs::is_regular_file(targetConf)) {
-    if (chosenConf.empty()) {
+    if (usingDefaultProfile) {
       std::string err;
       setupProtonConfigWindows(false, "", "", &err);
+      targetConf = getVpnConfigPath();
     } else {
       std::cerr << "[ERRO] Arquivo de configuração customizado não encontrado: " << chosenConf << std::endl;
       return false;
     }
   }
 
+  if (!fs::is_regular_file(targetConf)) {
+    std::cerr << "[ERRO] Perfil WireGuard nao encontrado: " << targetConf << std::endl;
+    return false;
+  }
+
   fs::path confPath = fs::temp_directory_path() / WG_CONFIG_NAME;
 
-  if (fs::is_regular_file(targetConf)) {
-    // Copiar e anexar diretiva de aplicativo WireSock
+  // Copiar e anexar diretiva de aplicativo WireSock (split-tunnel so Discord)
+  {
     std::ifstream src(targetConf);
     std::ofstream dst(confPath);
+    if (!src.is_open() || !dst.is_open()) {
+      std::cerr << "[ERRO] Falha ao preparar configuracao temporaria do WireSock." << std::endl;
+      return false;
+    }
     std::string line;
     while (std::getline(src, line)) {
       dst << line << "\n";
     }
     dst << "\n#@ws:AllowedApps = Discord, Update, DiscordCanary, DiscordPTB, Vesktop\n";
-    src.close();
-    dst.close();
-  } else {
+  }
+
+  if (!fs::is_regular_file(confPath)) {
+    std::cerr << "[ERRO] Configuracao temporaria do WireSock nao foi criada." << std::endl;
     return false;
   }
 
-  // Iniciar WireSock em background
-  std::wstring cmd = L"\"" + wsExe + L"\" run -config \"" + confPath.wstring() + L"\" -log-level none";
-
-  STARTUPINFOW si = {sizeof(si)};
-  si.dwFlags = STARTF_USESHOWWINDOW;
-  si.wShowWindow = SW_HIDE;
-  PROCESS_INFORMATION pi = {0};
-
-  BOOL ok = CreateProcessW(
-      nullptr, const_cast<LPWSTR>(cmd.data()), nullptr, nullptr, FALSE,
-      CREATE_NO_WINDOW | DETACHED_PROCESS, nullptr, nullptr, &si, &pi);
-
-  if (ok) {
-    CloseHandle(pi.hProcess);
-    CloseHandle(pi.hThread);
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    return isWireSockRunning();
-  }
-
-  return false;
+  return startWireSockClientProcess(wsExe, confPath);
 }
 
 inline bool launchDiscord(const std::wstring &exePath) {

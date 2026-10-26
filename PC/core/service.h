@@ -103,9 +103,27 @@ public:
     return isDiscordRunning();
   }
 
+  std::string defaultConfigPath() const {
+#ifdef _WIN32
+    return getVpnConfigPath();
+#else
+    return "ardc_vpn.conf";
+#endif
+  }
+
+  std::string resolveConfigPath(const std::string &chosen) const {
+    if (chosen.empty() || chosen == "ardc_vpn.conf")
+      return defaultConfigPath();
+    return chosen;
+  }
+
+  bool hasLocalConfigFile() const {
+    return fs::is_regular_file(defaultConfigPath());
+  }
+
   TunnelStatus queryStatus(const std::string &currentConfig = "ardc_vpn.conf") {
     TunnelStatus st;
-    st.activeConfig = currentConfig;
+    st.activeConfig = resolveConfigPath(currentConfig);
     st.isDiscordActive = isDiscordActive();
     st.isTunnelUp = isTunnelActive();
 
@@ -176,6 +194,8 @@ public:
       if (onProgress) onProgress(m);
     };
 
+    const std::string resolvedConf = resolveConfigPath(configPath);
+
     notify("Verificando instâncias do Discord...");
     if (isDiscordRunning()) {
 #ifndef _WIN32
@@ -188,9 +208,9 @@ public:
       killDiscord();
     }
 
-    notify("Ativando túnel WireGuard isolado (" + configPath + ")...");
+    notify("Ativando túnel WireGuard isolado (" + resolvedConf + ")...");
 #ifndef _WIN32
-    bool tunnelOk = ensureWireGuardNetns(configPath);
+    bool tunnelOk = ensureWireGuardNetns(resolvedConf);
     if (!tunnelOk) {
       outErr = "Falha ao negociar ou validar o túnel WireGuard.";
       addLog(outErr, 3);
@@ -213,9 +233,9 @@ public:
       return false;
     }
 #else
-    bool tunnelOk = ensureWireGuardWindows(configPath);
+    bool tunnelOk = ensureWireGuardWindows(resolvedConf);
     if (!tunnelOk) {
-      outErr = "Falha ao ativar o driver WFP do WireSock.";
+      outErr = "Falha ao ativar o driver WFP do WireSock (wiresock-client nao permaneceu ativo).";
       addLog(outErr, 3);
       return false;
     }
@@ -259,9 +279,14 @@ public:
       stopAll(outErr);
     }
     try {
-      if (fs::exists("ardc_vpn.conf")) {
+      std::string confPath = defaultConfigPath();
+      if (fs::exists(confPath)) {
+        fs::remove(confPath);
+        addLog("Arquivo de perfil WireGuard excluído: " + confPath, 1);
+      }
+      if (confPath != "ardc_vpn.conf" && fs::exists("ardc_vpn.conf")) {
         fs::remove("ardc_vpn.conf");
-        addLog("Arquivo de perfil WireGuard 'ardc_vpn.conf' excluído.", 1);
+        addLog("Arquivo relativo 'ardc_vpn.conf' excluído.", 1);
       }
     } catch (const std::exception &e) {
       addLog(std::string("Erro ao remover ardc_vpn.conf: ") + e.what(), 2);
