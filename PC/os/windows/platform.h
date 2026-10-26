@@ -349,47 +349,32 @@ inline std::wstring findProtonConfgenExe() {
 #endif
 }
 
-inline bool isValidWireGuardConfFile(const fs::path &path) {
-  if (!fs::is_regular_file(path))
-    return false;
-  std::error_code ec;
-  if (fs::file_size(path, ec) < 32)
-    return false;
-  std::ifstream in(path);
-  if (!in.is_open())
-    return false;
-  std::string content((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
-  return content.find("[Interface]") != std::string::npos &&
-         content.find("PrivateKey") != std::string::npos;
-}
-
 inline std::string getVpnConfigPath() {
   wchar_t localApp[MAX_PATH];
   fs::path preferred;
   if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
     preferred = fs::path(localApp) / "Perseus" / "ardc_vpn.conf";
+    if (fs::is_regular_file(preferred))
+      return preferred.string();
   }
 
-  std::vector<fs::path> candidates;
-  if (!preferred.empty())
-    candidates.push_back(preferred);
-  candidates.push_back("ardc_vpn.conf");
+  // Migracao: conf antigo relativo ao CWD ou ao lado do .exe
+  if (fs::is_regular_file("ardc_vpn.conf")) {
+    std::error_code ec;
+    fs::path abs = fs::absolute("ardc_vpn.conf", ec);
+    if (!ec)
+      return abs.string();
+    return "ardc_vpn.conf";
+  }
 
   wchar_t modulePath[MAX_PATH];
   if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH) != 0) {
-    candidates.push_back(fs::path(modulePath).parent_path() / "ardc_vpn.conf");
+    fs::path appConf = fs::path(modulePath).parent_path() / "ardc_vpn.conf";
+    if (fs::is_regular_file(appConf))
+      return appConf.string();
   }
 
-  // Preferir qualquer conf VALIDO existente (evita pegar arquivo vazio em LocalAppData)
-  for (const auto &cand : candidates) {
-    if (isValidWireGuardConfFile(cand)) {
-      std::error_code ec;
-      fs::path abs = fs::absolute(cand, ec);
-      return ec ? cand.string() : abs.string();
-    }
-  }
-
-  // Destino padrao para gravar novo perfil
+  // Novo padrao estavel: %LOCALAPPDATA%\Perseus\ardc_vpn.conf
   if (!preferred.empty()) {
     std::error_code ec;
     fs::create_directories(preferred.parent_path(), ec);
@@ -404,68 +389,92 @@ inline std::string resolveVpnConfigPath(const std::string &chosenConf) {
   return chosenConf;
 }
 
-inline bool waitForWireSockRunning(int attempts = 15, int stepMs = 300) {
-  for (int i = 0; i < attempts; ++i) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(stepMs));
-    if (isWireSockRunning()) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(700));
-      return isWireSockRunning();
-    }
-  }
-  return false;
+inline fs::path &wireSockRuntimeConfPath() {
+  static fs::path path;
+  return path;
 }
 
-inline bool launchProcessCmd(const std::wstring &cmdLine, DWORD creationFlags, WORD showCmd) {
+inline bool startWireSockClientProcess(const std::wstring &wsExe, const fs::path &confPath) {
+  wireSockRuntimeConfPath() = confPath;
+
+  std::wstring args = L"run -config \"" + confPath.wstring() + L"\" -log-level none";
+
+  auto waitUntilStable = []() -> bool {
+    for (int i = 0; i < 15; ++i) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(350));
+      if (isWireSockRunning()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        return isWireSockRunning();
+      }
+    }
+    return false;
+  };
+
+  // 1) Preferir ShellExecuteEx: processo independente da arvore do Perseus (menos chance de AV/job matar junto)
+  {
+    SHELLEXECUTEINFOW sei;
+    ZeroMemory(&sei, sizeof(sei));
+    sei.cbSize = sizeof(sei);
+    sei.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
+    sei.lpVerb = L"open";
+    sei.lpFile = wsExe.c_str();
+    sei.lpParameters = args.c_str();
+    sei.nShow = SW_HIDE;
+    if (ShellExecuteExW(&sei)) {
+      if (sei.hProcess)
+        CloseHandle(sei.hProcess);
+      if (waitUntilStable())
+        return true;
+    }
+  }
+
+  // 2) Fallback: console oculto + fora de job/process group do pai
+  std::wstring cmd = L"\"" + wsExe + L"\" " + args;
   STARTUPINFOW si;
   ZeroMemory(&si, sizeof(si));
   si.cb = sizeof(si);
   si.dwFlags = STARTF_USESHOWWINDOW;
-  si.wShowWindow = showCmd;
+  si.wShowWindow = SW_HIDE;
 
   PROCESS_INFORMATION pi;
   ZeroMemory(&pi, sizeof(pi));
 
-  std::vector<wchar_t> cmdBuf(cmdLine.begin(), cmdLine.end());
+  std::vector<wchar_t> cmdBuf(cmd.begin(), cmd.end());
   cmdBuf.push_back(L'\0');
 
+  DWORD flags = CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP | CREATE_BREAKAWAY_FROM_JOB;
   BOOL ok = CreateProcessW(
       nullptr, cmdBuf.data(), nullptr, nullptr, FALSE,
-      creationFlags, nullptr, nullptr, &si, &pi);
+      flags, nullptr, nullptr, &si, &pi);
+  if (!ok) {
+    // CREATE_BREAKAWAY_FROM_JOB pode falhar se o job nao permitir; tenta sem ele
+    ZeroMemory(&pi, sizeof(pi));
+    ok = CreateProcessW(
+        nullptr, cmdBuf.data(), nullptr, nullptr, FALSE,
+        CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP, nullptr, nullptr, &si, &pi);
+  }
+
   if (!ok)
     return false;
+
   CloseHandle(pi.hProcess);
   CloseHandle(pi.hThread);
-  return true;
+  return waitUntilStable();
 }
 
-inline bool startWireSockClientProcess(const std::wstring &wsExe, const fs::path &confPath) {
-  const std::wstring conf = confPath.wstring();
-  const std::wstring exeQuoted = L"\"" + wsExe + L"\"";
-  const std::wstring confQuoted = L"\"" + conf + L"\"";
-  const std::wstring args = L" run -config " + confQuoted + L" -log-level none";
+inline bool ensureWireSockClientAlive() {
+  if (isWireSockRunning())
+    return true;
 
-  // 1) start /MIN — console real minimizado (mesmo comportamento do teste manual que funciona)
-  {
-    std::wstring cmd = L"cmd.exe /C start \"PerseusWG\" /MIN " + exeQuoted + args;
-    if (launchProcessCmd(cmd, CREATE_NO_WINDOW, SW_HIDE) && waitForWireSockRunning())
-      return true;
-  }
+  std::wstring wsExe = findWireSockExecutable();
+  if (wsExe.empty())
+    return false;
 
-  // 2) Novo console minimizado direto no wiresock-client
-  {
-    std::wstring cmd = exeQuoted + args;
-    if (launchProcessCmd(cmd, CREATE_NEW_CONSOLE, SW_SHOWMINNOACTIVE) && waitForWireSockRunning())
-      return true;
-  }
+  const fs::path &conf = wireSockRuntimeConfPath();
+  if (conf.empty() || !fs::is_regular_file(conf))
+    return false;
 
-  // 3) Fallback legado (algumas maquinas mantem o processo assim)
-  {
-    std::wstring cmd = exeQuoted + args;
-    if (launchProcessCmd(cmd, CREATE_NO_WINDOW | DETACHED_PROCESS, SW_HIDE) && waitForWireSockRunning())
-      return true;
-  }
-
-  return false;
+  return startWireSockClientProcess(wsExe, conf);
 }
 
 inline bool setupProtonConfigWindows(
@@ -718,8 +727,8 @@ inline bool ensureWireGuardWindows(const std::string &chosenConf = "") {
     }
   }
 
-  if (!isValidWireGuardConfFile(targetConf)) {
-    std::cerr << "[ERRO] Perfil WireGuard invalido ou ausente: " << targetConf << std::endl;
+  if (!fs::is_regular_file(targetConf)) {
+    std::cerr << "[ERRO] Perfil WireGuard nao encontrado: " << targetConf << std::endl;
     return false;
   }
 

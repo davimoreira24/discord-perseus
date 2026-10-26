@@ -254,6 +254,19 @@ public:
       addLog(outErr, 3);
       return false;
     }
+
+    // Em alguns PCs (AV / isolamento) o wiresock-client morre ao abrir o Discord.
+    // Revalida e reinsere o tunel sem fechar o Discord.
+    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+    if (!isWireSockRunning()) {
+      notify("WireSock caiu ao abrir o Discord — reiniciando tunel...");
+      if (!ensureWireSockClientAlive()) {
+        outErr = "WireSock foi encerrado ao abrir o Discord (possivel antivirus). Tente exclusao no Defender.";
+        addLog(outErr, 3);
+        return false;
+      }
+      addLog("WireSock reiniciado com sucesso apos o Discord abrir.", 1);
+    }
 #endif
 
     addLog("Discord iniciado com sucesso! Bypass ativo.", 1);
