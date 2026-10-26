@@ -267,7 +267,7 @@ public:
       if (!isWireSockRunning()) {
         addLog("WireSock caiu antes de abrir o Discord.", 2);
         if (attempt == 3) {
-          outErr = "WireSock nao permanece ativo (possivel antivirus bloqueando wiresock-client).";
+          outErr = "WireSock nao permanece ativo. Desligue Tailscale/NoPing, rode Perseus como Admin e exclua wiresock-client no Defender.";
           return false;
         }
         continue;

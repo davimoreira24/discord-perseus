@@ -397,21 +397,55 @@ inline fs::path &wireSockRuntimeConfPath() {
 inline bool startWireSockClientProcess(const std::wstring &wsExe, const fs::path &confPath) {
   wireSockRuntimeConfPath() = confPath;
 
-  std::wstring args = L"run -config \"" + confPath.wstring() + L"\" -log-level none";
-
+  // Exige processo vivo em varias checagens (evita falso positivo de 1-2s)
   auto waitUntilStable = []() -> bool {
-    for (int i = 0; i < 15; ++i) {
-      std::this_thread::sleep_for(std::chrono::milliseconds(350));
+    int aliveHits = 0;
+    for (int i = 0; i < 20; ++i) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(400));
       if (isWireSockRunning()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        return isWireSockRunning();
+        if (++aliveHits >= 4)
+          return true;
+      } else {
+        aliveHits = 0;
       }
     }
     return false;
   };
 
-  // 1) Preferir ShellExecuteEx: processo independente da arvore do Perseus (menos chance de AV/job matar junto)
+  auto tryCreate = [&](const std::wstring &cmdLine, DWORD flags, WORD showCmd) -> bool {
+    STARTUPINFOW si;
+    ZeroMemory(&si, sizeof(si));
+    si.cb = sizeof(si);
+    si.dwFlags = STARTF_USESHOWWINDOW;
+    si.wShowWindow = showCmd;
+
+    PROCESS_INFORMATION pi;
+    ZeroMemory(&pi, sizeof(pi));
+
+    std::vector<wchar_t> cmdBuf(cmdLine.begin(), cmdLine.end());
+    cmdBuf.push_back(L'\0');
+
+    if (!CreateProcessW(nullptr, cmdBuf.data(), nullptr, nullptr, FALSE, flags, nullptr, nullptr, &si, &pi))
+      return false;
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    return waitUntilStable();
+  };
+
+  // 1) Mesmo padrao do teste manual que funcionou no PC do amigo:
+  //    cmd /c start "titulo" /MIN "wiresock-client.exe" run -config "..."
+  //    (processo totalmente desconectado do Perseus)
   {
+    std::wstring startCmd =
+        L"cmd.exe /C start \"PerseusWireSock\" /MIN \"" + wsExe +
+        L"\" run -config \"" + confPath.wstring() + L"\" -log-level none";
+    if (tryCreate(startCmd, CREATE_NO_WINDOW, SW_HIDE))
+      return true;
+  }
+
+  // 2) ShellExecuteEx independente
+  {
+    std::wstring args = L"run -config \"" + confPath.wstring() + L"\" -log-level none";
     SHELLEXECUTEINFOW sei;
     ZeroMemory(&sei, sizeof(sei));
     sei.cbSize = sizeof(sei);
@@ -419,7 +453,7 @@ inline bool startWireSockClientProcess(const std::wstring &wsExe, const fs::path
     sei.lpVerb = L"open";
     sei.lpFile = wsExe.c_str();
     sei.lpParameters = args.c_str();
-    sei.nShow = SW_HIDE;
+    sei.nShow = SW_SHOWMINNOACTIVE;
     if (ShellExecuteExW(&sei)) {
       if (sei.hProcess)
         CloseHandle(sei.hProcess);
@@ -428,38 +462,16 @@ inline bool startWireSockClientProcess(const std::wstring &wsExe, const fs::path
     }
   }
 
-  // 2) Fallback: console oculto + fora de job/process group do pai
-  std::wstring cmd = L"\"" + wsExe + L"\" " + args;
-  STARTUPINFOW si;
-  ZeroMemory(&si, sizeof(si));
-  si.cb = sizeof(si);
-  si.dwFlags = STARTF_USESHOWWINDOW;
-  si.wShowWindow = SW_HIDE;
-
-  PROCESS_INFORMATION pi;
-  ZeroMemory(&pi, sizeof(pi));
-
-  std::vector<wchar_t> cmdBuf(cmd.begin(), cmd.end());
-  cmdBuf.push_back(L'\0');
-
-  DWORD flags = CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP | CREATE_BREAKAWAY_FROM_JOB;
-  BOOL ok = CreateProcessW(
-      nullptr, cmdBuf.data(), nullptr, nullptr, FALSE,
-      flags, nullptr, nullptr, &si, &pi);
-  if (!ok) {
-    // CREATE_BREAKAWAY_FROM_JOB pode falhar se o job nao permitir; tenta sem ele
-    ZeroMemory(&pi, sizeof(pi));
-    ok = CreateProcessW(
-        nullptr, cmdBuf.data(), nullptr, nullptr, FALSE,
-        CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP, nullptr, nullptr, &si, &pi);
+  // 3) Console minimizado direto
+  {
+    std::wstring cmd = L"\"" + wsExe + L"\" run -config \"" + confPath.wstring() + L"\" -log-level none";
+    if (tryCreate(cmd, CREATE_NEW_CONSOLE | CREATE_NEW_PROCESS_GROUP, SW_SHOWMINNOACTIVE))
+      return true;
+    if (tryCreate(cmd, CREATE_NEW_CONSOLE, SW_SHOWMINNOACTIVE))
+      return true;
   }
 
-  if (!ok)
-    return false;
-
-  CloseHandle(pi.hProcess);
-  CloseHandle(pi.hThread);
-  return waitUntilStable();
+  return false;
 }
 
 inline bool ensureWireSockClientAlive() {
