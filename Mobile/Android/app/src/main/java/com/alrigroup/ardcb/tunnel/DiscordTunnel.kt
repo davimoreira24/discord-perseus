@@ -2,7 +2,7 @@ package com.alrigroup.ardcb.tunnel
 
 import com.wireguard.android.backend.Tunnel
 
-class DiscordTunnel(private val name: String = "ARDiscordBypass") : Tunnel {
+class DiscordTunnel(private val name: String = "Perseus") : Tunnel {
     private var state: Tunnel.State = Tunnel.State.DOWN
     private var listener: ((Tunnel.State) -> Unit)? = null
 

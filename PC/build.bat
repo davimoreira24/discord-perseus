@@ -1,10 +1,10 @@
 @echo off
 
-title Compilando ARDiscordBypass v3.5.0
+title Compilando Perseus v3.5.0
 
 echo.
 echo =========================================================
-echo       Compilando ARDiscordBypass v3.5.0 (C++)
+echo       Compilando Perseus v3.5.0 (C++)
 echo =========================================================
 echo.
 
@@ -25,9 +25,9 @@ cd bin
 objcopy -I binary -O pe-x86-64 -B i386:x86-64 proton-confgen.exe ..\proton_confgen_embed.o
 cd ..
 
-echo [2/3] Compilando CLI: ARDiscordBypass.exe...
-g++ -O3 -std=c++20 -static -static-libgcc -static-libstdc++ main.cpp proton_confgen_embed.o -lws2_32 -lwinhttp -o ARDiscordBypass.exe
-strip ARDiscordBypass.exe 2>nul
+echo [2/3] Compilando CLI: Perseus.exe...
+g++ -O3 -std=c++20 -static -static-libgcc -static-libstdc++ main.cpp proton_confgen_embed.o -lws2_32 -lwinhttp -o Perseus.exe
+strip Perseus.exe 2>nul
 
 if %errorlevel% neq 0 (
     echo ERRO: Falha na compilacao do CLI!
@@ -36,7 +36,7 @@ if %errorlevel% neq 0 (
 )
 
 if "%BUILD_GUI%"=="1" (
-    echo [3/3] Compilando GUI Opcional: ARDiscordBypass_gui.exe...
+    echo [3/3] Compilando GUI Opcional: Perseus_gui.exe...
     g++ -O3 -std=c++20 -static -static-libgcc -static-libstdc++ ^
         gui/main.cpp ^
         gui/app_window.cpp ^
@@ -49,14 +49,14 @@ if "%BUILD_GUI%"=="1" (
         gui/vendor/imgui/backends/imgui_impl_opengl3.cpp ^
         -I . -I gui -I gui/vendor/imgui ^
         -lopengl32 -lgdi32 -luser32 -lcomdlg32 -lshell32 -ldwmapi -limm32 -lws2_32 -lwinhttp ^
-        -mwindows -o ARDiscordBypass_gui.exe
-    strip ARDiscordBypass_gui.exe 2>nul
+        -mwindows -o Perseus_gui.exe
+    strip Perseus_gui.exe 2>nul
 )
 
 echo.
 echo =========================================================
 echo  Compilacao concluida com sucesso!
-echo  CLI: ARDiscordBypass.exe
-if "%BUILD_GUI%"=="1" echo  GUI: ARDiscordBypass_gui.exe
+echo  CLI: Perseus.exe
+if "%BUILD_GUI%"=="1" echo  GUI: Perseus_gui.exe
 echo =========================================================
 pause

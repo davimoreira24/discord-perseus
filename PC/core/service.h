@@ -296,7 +296,7 @@ public:
 
 private:
   Service() {
-    addLog("ARDiscordBypass Core inicializado.", 0);
+    addLog("Perseus Core inicializado.", 0);
   }
   std::mutex m_mutex;
   std::vector<LogEntry> m_logs;

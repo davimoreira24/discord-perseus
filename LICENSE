@@ -1,10 +1,10 @@
-ARGLFU - ALRI GROUP LICENSE FREE USE
-Version 2 – 2026
+Perseus — made by dm24
+License Free Use — Version 2 – 2026
 
 1. Definitions
-"The Work": Refers to the original software, source code, scripts, or documentation provided by ALRI Group.
+"The Work": Refers to the original software, source code, scripts, or documentation provided under this license.
 
-"Licensor": ALRI Group (@ALRI GROUP).
+"Licensor": dm24.
 
 "Modification": Any alteration, transformation, or derivative work based on the original source code.
 
@@ -14,7 +14,7 @@ The Work may be freely used and distributed for non-commercial purposes at no co
 Distribution is permitted only in its original, unmodified form. You may share the files, but you must not alter them.
 
 3. Prohibition of Modifications
-No Derivatives: You are not permitted to modify, adapt, build upon, or merge The Work with other projects without express written authorization from the ALRI Group.
+No Derivatives: You are not permitted to modify, adapt, build upon, or merge The Work with other projects without express written authorization from the Licensor.
 
 Any attempt to modify the source code without prior permission will result in the immediate termination of your rights under this license.
 
@@ -24,12 +24,11 @@ Prohibition of Sale: It is strictly forbidden to sell, rent, or monetize The Wor
 The Work must remain free of charge for the end-user. Commercial use of any kind is prohibited unless a separate commercial agreement is signed with the Licensor.
 
 5. Disclaimer of Liability (No Warranty)
-THE WORK IS PROVIDED "AS IS". ALRI Group shall not be held liable for any damages, data loss, technical failures, or legal issues arising from the use or misuse of the project. The user assumes all risks associated with the execution of this software.
+THE WORK IS PROVIDED "AS IS". The Licensor shall not be held liable for any damages, data loss, technical failures, or legal issues arising from the use or misuse of the project. The user assumes all risks associated with the execution of this software.
 
 6. Trademark and Intellectual Property
-This license does not grant permission to use the trade names, logos, or product names of ALRI Group for any purpose. All intellectual property rights remain exclusively with the ALRI Group.
+This license does not grant permission to use the trade names, logos, or product names of Perseus / dm24 for any purpose. All intellectual property rights remain exclusively with the Licensor.
 
-https://alrigroup.com
-https://github.com/alrigroup/licenses
-Created by AlexsanderAlRi
-Copyright © 2020-2026 ALRI Group. All rights reserved.
+https://github.com/davimoreira24/discord-perseus
+Created by dm24
+Copyright © 2026 dm24. All rights reserved.

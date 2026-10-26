@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
         setupNavigationTabs()
         setupClickListeners()
 
-        tvVersion.text = "v" + UpdateChecker.CURRENT_VERSION + " • ALRI GROUP"
+        tvVersion.text = "v" + UpdateChecker.CURRENT_VERSION + " • dm24"
 
         printAsciiBanner()
         startBlinkingCursor()
@@ -323,7 +323,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnOpenGitHub.setOnClickListener {
-            val url = "https://github.com/alrigroup/ARDiscordBypass"
+            val url = "https://github.com/davimoreira24/discord-perseus"
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
         }
 
@@ -450,8 +450,8 @@ class MainActivity : AppCompatActivity() {
     private fun printAsciiBanner() {
         val banner = """
  ╔════════════════════════════════════════════╗
- ║         ARDiscordBypass v3.5.0             ║
- ║      ALRI GROUP // Discord Split-Tunnel    ║
+ ║         Perseus v3.5.0             ║
+ ║      dm24 // Discord Split-Tunnel    ║
  ╚════════════════════════════════════════════╝
         """.trimIndent()
 
@@ -859,7 +859,7 @@ class MainActivity : AppCompatActivity() {
             ⚡ COMO FUNCIONA O BYPASS:
             
             1. Roteamento por Processo (Split-Tunneling):
-            O ARDiscordBypass utiliza a tecnologia WireGuard para criar um túnel exclusivo apenas para os aplicativos do Discord (com.discord, canary, ptb, aliucord, vencord).
+            O Perseus utiliza a tecnologia WireGuard para criar um túnel exclusivo apenas para os aplicativos do Discord (com.discord, canary, ptb, aliucord, vencord).
             
             2. Sua Internet Fica Intocada:
             Todo o restante do seu celular (WhatsApp, bancos, jogos, YouTube e chamadas) continua 100% na sua internet normal sem consumir dados do túnel e com ping nativo.
@@ -892,19 +892,16 @@ class MainActivity : AppCompatActivity() {
         btnAction.text = "[ FECHAR ]"
 
         val credits = """
-            🚀 ARDiscordBypass v3.5.0
+            🚀 Perseus v3.5.0
             
             👤 Desenvolvimento & Autor:
-            Alexsanderalri
+            dm24
             
-            🏢 Organização:
-            ALRI Group (Copyright © 2020-2026)
-            
-            📄 Licença:
-            ARGLFU (ALRI GROUP LICENSE FREE USE) v2
+            🏷️ Branding:
+            made by dm24
             
             🌐 Repositório Oficial:
-            github.com/alrigroup/ARDiscordBypass
+            github.com/davimoreira24/discord-perseus
             
             🛡️ Proteção de Conexão:
             WireGuard Native Split-Tunnel Engine
@@ -920,7 +917,7 @@ class MainActivity : AppCompatActivity() {
     private fun showUpdateDialog(info: UpdateChecker.UpdateInfo) {
         AlertDialog.Builder(this)
             .setTitle("Nova Atualização: v${info.latestVersion}")
-            .setMessage("Uma nova versão do ARDiscordBypass está disponível.\n\nNovidades:\n${info.releaseNotes}")
+            .setMessage("Uma nova versão do Perseus está disponível.\n\nNovidades:\n${info.releaseNotes}")
             .setPositiveButton("Baixar Atualização") { _, _ ->
                 val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(info.downloadUrl))
                 startActivity(browserIntent)

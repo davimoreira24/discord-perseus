@@ -7,11 +7,11 @@ out/
 *.o
 *.obj
 *.exe
-!ARDiscordBypass.exe
-!ARDiscordBypass_gui.exe
-!ARDiscordBypass_linux
-!ARDiscordBypass_gui_linux
-!ARDiscordBypass.apk
+!Perseus.exe
+!Perseus_gui.exe
+!Perseus_linux
+!Perseus_gui_linux
+!Perseus.apk
 !bin/*
 !PC/bin/*
 *.out

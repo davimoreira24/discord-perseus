@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ARDiscordBypass"
+rootProject.name = "Perseus"
 include(":app")

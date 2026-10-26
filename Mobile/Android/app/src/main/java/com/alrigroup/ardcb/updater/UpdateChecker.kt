@@ -9,7 +9,7 @@ import java.net.URL
 import kotlin.concurrent.thread
 
 object UpdateChecker {
-    private const val GITHUB_REPO = "alrigroup/ARDiscordBypass"
+    private const val GITHUB_REPO = "davimoreira24/discord-perseus"
     private const val API_URL = "https://api.github.com/repos/$GITHUB_REPO/releases/latest"
     const val CURRENT_VERSION = "3.5.0"
 
@@ -27,7 +27,7 @@ object UpdateChecker {
                 val conn = url.openConnection() as HttpURLConnection
                 conn.connectTimeout = 8000
                 conn.readTimeout = 8000
-                conn.setRequestProperty("User-Agent", "ARDiscordBypass-Android/$CURRENT_VERSION")
+                conn.setRequestProperty("User-Agent", "Perseus-Android/$CURRENT_VERSION")
                 conn.setRequestProperty("Accept", "application/vnd.github.v3+json")
 
                 if (conn.responseCode == 200) {

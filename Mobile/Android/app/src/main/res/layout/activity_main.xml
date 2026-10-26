@@ -27,7 +27,7 @@
                 android:layout_width="38dp"
                 android:layout_height="38dp"
                 android:src="@drawable/alri_logo"
-                android:contentDescription="ALRI GROUP Logo" />
+                android:contentDescription="dm24 Logo" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -40,7 +40,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
-                    android:text="ARDiscordBypass"
+                    android:text="Perseus"
                     android:textColor="@color/alri_red"
                     android:textSize="14sp"
                     android:textStyle="bold" />
@@ -50,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="monospace"
-                    android:text="v3.5.0 • ALRI GROUP"
+                    android:text="v3.5.0 • dm24"
                     android:textColor="@color/terminal_text_secondary"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -867,7 +867,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:fontFamily="monospace"
-                            android:text="ARDiscordBypass — ALRI GROUP"
+                            android:text="Perseus — made by dm24"
                             android:textColor="@color/alri_red"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -899,7 +899,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:fontFamily="monospace"
-                            android:text="O ARDiscordBypass é uma solução de alto desempenho desenvolvida para liberar transmissões de tela e câmera no Discord no Brasil com zero impacto em jogos e outros apps."
+                            android:text="O Perseus é uma solução de alto desempenho desenvolvida para liberar transmissões de tela e câmera no Discord no Brasil com zero impacto em jogos e outros apps."
                             android:textColor="@color/terminal_text_secondary"
                             android:textSize="11sp" />
 
@@ -981,7 +981,7 @@
                 android:id="@+id/splashLogo"
                 android:layout_width="96dp"
                 android:layout_height="96dp"
-                android:contentDescription="ALRI GROUP Splash"
+                android:contentDescription="dm24 Splash"
                 android:src="@drawable/alri_logo" />
 
             <TextView
@@ -990,7 +990,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:fontFamily="monospace"
-                android:text="ARDiscordBypass v3.5.0"
+                android:text="Perseus v3.5.0"
                 android:textColor="@color/alri_red"
                 android:textSize="15sp"
                 android:textStyle="bold" />
@@ -1000,7 +1000,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:fontFamily="monospace"
-                android:text="ALRI GROUP // INICIALIZANDO..."
+                android:text="made by dm24 // INICIALIZANDO..."
                 android:textColor="@color/terminal_text_secondary"
                 android:textSize="11sp" />
         </LinearLayout>

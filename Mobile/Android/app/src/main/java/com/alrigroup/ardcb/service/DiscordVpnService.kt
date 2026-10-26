@@ -20,7 +20,7 @@ class DiscordVpnService : GoBackend.VpnService() {
         const val NOTIF_ID = 1001
         const val ACTION_STOP = "com.alrigroup.ardcb.STOP_VPN"
 
-        val tunnel = DiscordTunnel("ARDiscordBypass")
+        val tunnel = DiscordTunnel("Perseus")
         var isConnected = false
             private set
 
@@ -89,7 +89,7 @@ class DiscordVpnService : GoBackend.VpnService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "ARDiscordBypass Status",
+                "Perseus Status",
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
                 description = "Notificação de serviço contínuo do bypass do Discord"
@@ -115,7 +115,7 @@ class DiscordVpnService : GoBackend.VpnService() {
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("ARDiscordBypass v3.5.0 (ALRI GROUP)")
+            .setContentTitle("Perseus v3.5.0 (dm24)")
             .setContentText(text)
             .setSmallIcon(android.R.drawable.ic_lock_lock)
             .setContentIntent(pOpen)

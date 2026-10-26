@@ -1,8 +1,8 @@
 # protonvpn-wg-confgen
 
-> 🛡️ **Integração no Ecossistema ARDiscordBypass v3.5.0**:  
+> 🛡️ **Integração no Ecossistema Perseus v3.5.0**:  
 > Este código-fonte é o motor oficial open-source de autenticação e geração de perfis WireGuard utilizado em todas as plataformas:
-> 1. **Desktop (Linux e Windows)**: Compilado em binário estático e embutido diretamente como objeto PE/ELF (`proton_confgen_embed.o`) nos executáveis `ARDiscordBypass.exe`, `ARDiscordBypass_gui.exe`, `ARDiscordBypass_linux` e `ARDiscordBypass_gui_linux`. Na primeira execução, o binário auto-extrai o utilitário de forma transparente para `%LOCALAPPDATA%\ARDiscordBypass` ou `~/.local/share/ARDiscordBypass`.
+> 1. **Desktop (Linux e Windows)**: Compilado em binário estático e embutido diretamente como objeto PE/ELF (`proton_confgen_embed.o`) nos executáveis `Perseus.exe`, `Perseus_gui.exe`, `Perseus_linux` e `Perseus_gui_linux`. Na primeira execução, o binário auto-extrai o utilitário de forma transparente para `%LOCALAPPDATA%\Perseus` ou `~/.local/share/Perseus`.
 > 2. **Mobile (Android)**: Compilado como biblioteca de sistema (`libprotonconfgen.so`) em `Mobile/Android/app/src/main/jniLibs/arm64-v8a/` para contornar restrições de W^X e SELinux sem necessidade de root.
 > 3. **Melhorias Aplicadas**: Normalização case-insensitive de sufixos de domínio (`@proton.me`, `@pm.me`, etc.), fallback customizado de resolução DNS para Go puro no Android, e tratamento aprimorado de erros da API SRP.
 >

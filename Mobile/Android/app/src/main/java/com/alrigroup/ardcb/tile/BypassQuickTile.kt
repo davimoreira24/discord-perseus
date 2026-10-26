@@ -42,7 +42,7 @@ class BypassQuickTile : TileService() {
     private fun updateTileState(active: Boolean) {
         val tile = qsTile ?: return
         tile.state = if (active) Tile.STATE_ACTIVE else Tile.STATE_INACTIVE
-        tile.label = if (active) "Bypass Ativo" else "ARDiscordBypass"
+        tile.label = if (active) "Bypass Ativo" else "Perseus"
         tile.updateTile()
     }
 }

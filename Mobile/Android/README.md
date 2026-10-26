@@ -1,6 +1,6 @@
-# 📱 ARDiscordBypass — Android Mobile Engine
+# 📱 Perseus — Android Mobile Engine
 
-Documentação de arquitetura, compilação e diretrizes de transparência de código aberto do cliente Android do **ARDiscordBypass v3.5.0**.
+Documentação de arquitetura, compilação e diretrizes de transparência de código aberto do cliente Android do **Perseus v3.5.0**.
 
 ---
 
@@ -22,7 +22,7 @@ Documentação de arquitetura, compilação e diretrizes de transparência de c�
 
 ## 1. Visão Geral & Arquitetura
 
-O aplicativo Android do **ARDiscordBypass** foi desenvolvido em **Kotlin nativo** utilizando o componente `android.net.VpnService` em conjunto com a biblioteca oficial `com.wireguard.android:tunnel`.
+O aplicativo Android do **Perseus** foi desenvolvido em **Kotlin nativo** utilizando o componente `android.net.VpnService` em conjunto com a biblioteca oficial `com.wireguard.android:tunnel`.
 
 O aplicativo é estruturado em:
 * **Interface Monospace Cyberpunk / OLED Black**: 4 abas organizadas em categorias (Dashboard, Configurações, Logs, Sobre) com transição de opacidade desacelerada e animações de status em tempo real.
@@ -88,7 +88,7 @@ func init() {
 
 ## 3. Split-Tunneling Estrito por UID de Aplicativo
 
-O ARDiscordBypass Mobile utiliza `addAllowedApplication` da API `VpnService.Builder`. Apenas os pacotes correspondentes aos aplicativos do Discord têm seu tráfego roteado para a interface virtual `tun0`:
+O Perseus Mobile utiliza `addAllowedApplication` da API `VpnService.Builder`. Apenas os pacotes correspondentes aos aplicativos do Discord têm seu tráfego roteado para a interface virtual `tun0`:
 
 ```kotlin
 val builder = VpnService.Builder()
@@ -147,4 +147,4 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 1. **Zero Modificação**: O APK do Discord não é modificado nem recompilado.
 2. **Zero Injeção**: O aplicativo utiliza apenas as APIs padrão de VPN do sistema operacional Android.
 3. **Chaves Privadas Seguras**: O par de chaves WireGuard é gerado localmente na memória RAM do aparelho e gravado exclusivamente no armazenamento interno privado do app (`ardc_vpn.conf`).
-4. **Sem Telemetria**: O ARDiscordBypass não envia relatórios, dados de uso ou senhas para nenhum servidor terceiro ou próprio da ALRI GROUP. A comunicação ocorre exclusivamente entre o aparelho do usuário e os endpoints da ProtonVPN / Discord.
+4. **Sem Telemetria**: O Perseus não envia relatórios, dados de uso ou senhas para nenhum servidor terceiro ou próprio da dm24. A comunicação ocorre exclusivamente entre o aparelho do usuário e os endpoints da ProtonVPN / Discord.

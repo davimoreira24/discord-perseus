@@ -9,68 +9,52 @@
 #include <regex>
 
 #define APP_VERSION "3.5.0"
-#define GITHUB_REPO "alrigroup/ARDiscordBypass"
+#define GITHUB_REPO "davimoreira24/discord-perseus"
 #define GITHUB_API_URL "https://api.github.com/repos/" GITHUB_REPO "/releases/latest"
 
-const char *ALRI_LOGO_FULL =
-"                    @@@@@@@               @@@@@@@                    \n"
-"                @@@@@@@@      @@@@@@@@@      @@@@@@@@                \n"
-"             @@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@             \n"
-"           @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@           \n"
-"          @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@          \n"
-"         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@         \n"
-"        @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@        \n"
-"       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@       \n"
-"       @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@       \n"
-"      @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      \n"
-"     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     \n"
-"     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     \n"
-"    @@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@    \n"
-"    @@@@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@      @@@@@@@@@@@@@@@@@    \n"
-"    @@@@@@@@@@@@@@@@@         @@@@@@@@@         @@@@@@@@@@@@@@@@@@   \n"
-"   @@@@@@@@@@@@@@@@@@        @@@@@@@@@@@        @@@@@@@@@@@@@@@@@@   \n"
-"   @@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@@@@   \n"
-"   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   \n"
-"   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@   \n"
-"  @@@@@@@@@@@@@@@@@@@@@@@@@   @@    @@    @@@@@@@@@@@@@@@@@@@@@@@@@  \n"
-"   @@@@@@@@@@@@@@@@@@@@@@@ @@@   @@@   @@@@@@@@@@@@@@@@@@@@@@@@@@@   \n"
-"    @@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@    \n"
-"       @@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@     @@@@@@@@@@@@@@@       \n"
-"          @@@@@@@@@@@@@@                     @@@@@@@@@@@@@@          \n"
-"               @@@@@@@@                       @@@@@@@@@              \n";
+const char *PERSEUS_LOGO_FULL =
+"                         @@@@@@@@@@@@                         \n"
+"                    @@@@@@@@@@@@@@@@@@@@@@@@                    \n"
+"                 @@@@@@@@            @@@@@@@@                 \n"
+"               @@@@@@                    @@@@@@               \n"
+"              @@@@@        @@@@@@@@        @@@@@              \n"
+"             @@@@@      @@@@@@@@@@@@@@      @@@@@             \n"
+"             @@@@     @@@@@@@@@@@@@@@@@@     @@@@             \n"
+"             @@@@    @@@@@@@@@@@@@@@@@@@@    @@@@             \n"
+"             @@@@    @@@@@@@@    @@@@@@@@    @@@@             \n"
+"             @@@@@   @@@@@@@      @@@@@@@   @@@@@             \n"
+"              @@@@@   @@@@@@@@@@@@@@@@@@   @@@@@              \n"
+"               @@@@@@   @@@@@@@@@@@@@@   @@@@@@               \n"
+"                 @@@@@@@@            @@@@@@@@                 \n"
+"                    @@@@@@@@@@@@@@@@@@@@@@@@                    \n"
+"                         @@@@@@@@@@@@                         \n";
 
-const char *ALRI_LOGO_COMPACT =
-"          @@@@@       @@@@@          \n"
-"      @@@@@   @@@@@@@   @@@@@        \n"
-"    @@@@@@@@@@@@@@@@@@@@@@@@@@@      \n"
-"   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@     \n"
-"  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    \n"
-"  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@    \n"
-"  @@@@@@@@  @@@@@@@@@  @@@@@@@@      \n"
-"  @@@@@@@@    @@@@@    @@@@@@@@      \n"
-"  @@@@@@@@@  @@@@@@@  @@@@@@@@@      \n"
-"  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@      \n"
-"   @@@@@@@@@@ @  @ @ @@@@@@@@@@      \n"
-"    @@@@@@@  @@@@@@@  @@@@@@@        \n"
-"       @@@@@@       @@@@@@           \n"
-"         @@@         @@@             \n";
+const char *PERSEUS_LOGO_COMPACT =
+"         @@@@@@@@         \n"
+"      @@@@      @@@@      \n"
+"     @@@  @@@@@@@@  @@@   \n"
+"     @@  @@@@@@@@@@  @@   \n"
+"     @@  @@@@  @@@@  @@   \n"
+"     @@@  @@@@@@@@  @@@   \n"
+"      @@@@      @@@@      \n"
+"         @@@@@@@@         \n";
 
 const char *ASCII_ART_FULL =
-"  $$$$$$\\  $$$$$$$\\        $$$$$$$\\   $$$$$$\\        $$$$$$$\\ $$\\     $$\\ $$$$$$$\\   $$$$$$\\   $$$$$$\\   $$$$$$\\  \n"
-" $$  __$$\\ $$  __$$\\       $$  __$$\\ $$  __$$\\       $$  __$$\\\\$$\\   $$  |$$  __$$\\ $$  __$$\\ $$  __$$\\ $$  __$$\\ \n"
-" $$ /  $$ |$$ |  $$ |      $$ |  $$ |$$ /  \\__|      $$ |  $$ |\\$$\\ $$  / $$ |  $$ |$$ /  $$ |$$ /  \\__|$$ /  \\__|\n"
-" $$$$$$$$ |$$$$$$$  |      $$ |  $$ |$$ |            $$$$$$$\\ | \\$$$$  /  $$$$$$$  |$$$$$$$$ |\\$$$$$$\\  \\$$$$$$\\  \n"
-" $$  __$$ |$$  __$$<       $$ |  $$ |$$ |            $$  __$$\\   \\$$  /   $$  ____/ $$  __$$ | \\____$$\\  \\____$$\\ \n"
-" $$ |  $$ |$$ |  $$ |      $$ |  $$ |$$ |  $$\\       $$ |  $$ |   $$ |    $$ |      $$ |  $$ |$$\\   $$ |$$\\   $$ |\n"
-" $$ |  $$ |$$ |  $$ |      $$$$$$$  |\\$$$$$$  |      $$$$$$$  |   $$ |    $$ |      $$ |  $$ |\\$$$$$$  |\\$$$$$$  |\n"
-" \\__|  \\__|\\__|  \\__|      \\_______/  \\______/       \\_______/    \\__|    \\__|      \\__|  \\__| \\______/  \\______/ \n";
+" $$$$$$$\\ $$$$$$$$\\ $$$$$$$\\   $$$$$$\\  $$$$$$$$\\ $$\\   $$\\  $$$$$$\\  \n"
+" $$  __$$\\\\__$$  __|$$  __$$\\ $$  __$$\\ $$  _____|$$ |  $$ |$$  __$$\\ \n"
+" $$ |  $$ |  $$ |   $$ |  $$ |$$ /  \\__|$$ |      $$ |  $$ |$$ /  \\__|\n"
+" $$$$$$$  |  $$ |   $$$$$$$  |$$$$$$\\   $$$$$\\    $$ |  $$ |\\$$$$$$\\  \n"
+" $$  ____/   $$ |   $$  __$$< $$  __$$\\ $$  __|   $$ |  $$ | \\____$$\\ \n"
+" $$ |        $$ |   $$ |  $$ |$$ /  $$ |$$ |      $$ |  $$ |$$\\   $$ |\n"
+" $$ |        $$ |   $$ |  $$ | $$$$$$  |$$$$$$$$\\ \\$$$$$$  |\\$$$$$$  |\n"
+" \\__|        \\__|   \\__|  \\__| \\______/ \\________| \\______/  \\______/ \n";
 
 const char *ASCII_ART_COMPACT =
-"    _    ____  ____  _                         _ \n"
-"   / \\  |  _ \\|  _ \\(_)___  ___ ___  _ __ __| |\n"
-"  / _ \\ | |_) | | | | / __|/ __/ _ \\| '__/ _' |\n"
-" / ___ \\|  _ <| |_| | \\__ \\ (_| (_) | | | (_| |\n"
-"/_/   \\_\\_| \\_\\____/|_|___/\\___\\___/|_|  \\__,_|\n";
+" ____                           \n"
+"|  _ \\ ___ _ __ ___  ___ _   _ ___ \n"
+"| |_) / _ \\ '__/ __|/ _ \\ | | / __|\n"
+"|  __/  __/ |  \\__ \\  __/ |_| \\__ \\\n"
+"|_|   \\___|_|  |___/\\___|\\__,_|___/\n";
 
 void printCentered(const std::string &text, int termWidth, const char *color = UI::RESET) {
   int pad = (termWidth - static_cast<int>(text.length())) / 2;
@@ -85,32 +69,28 @@ void printBannerAnimated() {
   std::cout << "\033[?25l";
   std::cout << "\033[2J\033[H" << std::flush;
 
-  // 1. ANIMAÇÃO DE CONSTRUÇÃO DA LOGO: Efeito "Synthesizer / Materialização"
-  // As linhas surgem progressivamente de cima para baixo com brilho inicial que se fixa no tom ALRI
+  // 1. ANIMAÇÃO DE CONSTRUÇÃO DA LOGO
   if (termWidth >= 80) {
-    std::istringstream logoStream(ALRI_LOGO_FULL);
+    std::istringstream logoStream(PERSEUS_LOGO_FULL);
     std::string line;
     while (std::getline(logoStream, line)) {
       int pad = (termWidth - static_cast<int>(line.length())) / 2;
       if (pad < 0) pad = 0;
 
-      // Frame flash/construção
-      std::cout << "\r" << std::string(pad, ' ') << UI::RED_BRIGHT << line << UI::RESET << std::flush;
+      std::cout << "\r" << std::string(pad, ' ') << UI::BLUE_BRIGHT << line << UI::RESET << std::flush;
       std::this_thread::sleep_for(std::chrono::milliseconds(22));
 
-      // Fixa na cor vermelha sólida
-      std::cout << "\r" << std::string(pad, ' ') << UI::RED << line << UI::RESET << "\n" << std::flush;
+      std::cout << "\r" << std::string(pad, ' ') << UI::BLUE << line << UI::RESET << "\n" << std::flush;
     }
     std::cout << "\n";
 
-    // 2. DIGITAÇÃO / MATERIALIZAÇÃO DO TÍTULO "AR DC BYPASS"
+    // 2. MATERIALIZAÇÃO DO TÍTULO "PERSEUS"
     std::istringstream artStream(ASCII_ART_FULL);
     while (std::getline(artStream, line)) {
       int pad = (termWidth - static_cast<int>(line.length())) / 2;
       if (pad < 0) pad = 0;
 
-      // Efeito de escaneamento horizontal rápido por caractere
-      std::cout << std::string(pad, ' ') << UI::RED_BRIGHT;
+      std::cout << std::string(pad, ' ') << UI::BLUE_BRIGHT;
       for (char ch : line) {
         std::cout << ch << std::flush;
         if (ch != ' ') {
@@ -121,15 +101,14 @@ void printBannerAnimated() {
       std::this_thread::sleep_for(std::chrono::milliseconds(18));
     }
   } else {
-    // Modo Compacto para telas estreitas
-    std::istringstream logoStream(ALRI_LOGO_COMPACT);
+    std::istringstream logoStream(PERSEUS_LOGO_COMPACT);
     std::string line;
     while (std::getline(logoStream, line)) {
       int pad = (termWidth - static_cast<int>(line.length())) / 2;
       if (pad < 0) pad = 0;
-      std::cout << "\r" << std::string(pad, ' ') << UI::RED_BRIGHT << line << UI::RESET << std::flush;
+      std::cout << "\r" << std::string(pad, ' ') << UI::BLUE_BRIGHT << line << UI::RESET << std::flush;
       std::this_thread::sleep_for(std::chrono::milliseconds(25));
-      std::cout << "\r" << std::string(pad, ' ') << UI::RED << line << UI::RESET << "\n" << std::flush;
+      std::cout << "\r" << std::string(pad, ' ') << UI::BLUE << line << UI::RESET << "\n" << std::flush;
     }
     std::cout << "\n";
 
@@ -137,20 +116,19 @@ void printBannerAnimated() {
     while (std::getline(artStream, line)) {
       int pad = (termWidth - static_cast<int>(line.length())) / 2;
       if (pad < 0) pad = 0;
-      std::cout << std::string(pad, ' ') << UI::RED_BRIGHT << line << UI::RESET << "\n" << std::flush;
+      std::cout << std::string(pad, ' ') << UI::BLUE_BRIGHT << line << UI::RESET << "\n" << std::flush;
       std::this_thread::sleep_for(std::chrono::milliseconds(25));
     }
   }
 
-  // 3. DIVISÓRIA E CABEÇALHO COM ANIMAÇÃO DE REVELAÇÃO
   int barLen = termWidth > 80 ? 80 : termWidth - 4;
   if (barLen < 20) barLen = 20;
   std::string bar = std::string(barLen, '=');
   
   std::cout << "\n";
   printCentered(bar, termWidth, UI::DIM);
-  printCentered(std::string("ALRI GROUP - ARDiscordBypass v") + APP_VERSION + " (Discord Live)", termWidth, UI::BOLD);
-  printCentered(std::string("Repositório Oficial: https://github.com/") + GITHUB_REPO, termWidth, UI::MUTED);
+  printCentered(std::string("Perseus v") + APP_VERSION + " — made by dm24", termWidth, UI::BOLD);
+  printCentered(std::string("Repositório: https://github.com/") + GITHUB_REPO, termWidth, UI::MUTED);
   printCentered(bar, termWidth, UI::DIM);
   std::cout << "\n" << std::flush;
 

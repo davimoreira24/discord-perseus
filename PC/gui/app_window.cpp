@@ -151,7 +151,7 @@ void AppWindow::renderHeader() {
 
   ImGui::BeginGroup();
 
-  // Renderização da Logo Oficial da ALRI
+  // Renderização da Logo do Perseus
   if (m_logoTexId != 0) {
     if (m_splashDone) {
       ImGui::Image(static_cast<ImTextureID>(m_logoTexId), ImVec2(42, 42));
@@ -163,10 +163,10 @@ void AppWindow::renderHeader() {
 
   // Títulos
   ImGui::BeginGroup();
-  ImGui::TextColored(th.alriRed, "ARDiscordBypass");
+  ImGui::TextColored(th.accent, "Perseus");
   ImGui::SameLine(0.0f, 6.0f);
   ImGui::TextColored(th.textMuted, "v3.5.0");
-  ImGui::TextColored(th.textSecondary, "ALRI GROUP • Split-Tunneling WireGuard");
+  ImGui::TextColored(th.textSecondary, "made by dm24 • Split-Tunneling WireGuard");
   ImGui::EndGroup();
 
   ImGui::EndGroup();
@@ -260,9 +260,9 @@ void AppWindow::renderNavigation() {
 
     bool isActive = (m_activeTab == i);
     if (isActive) {
-      ImGui::PushStyleColor(ImGuiCol_Button, th.alriRed);
-      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.alriRedGlow);
-      ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.alriRedDark);
+      ImGui::PushStyleColor(ImGuiCol_Button, th.accent);
+      ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.accentGlow);
+      ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.accentDark);
       ImGui::PushStyleColor(ImGuiCol_Text, th.btnText);
     } else {
       ImGui::PushStyleColor(ImGuiCol_Button, th.card);
@@ -364,7 +364,7 @@ void AppWindow::renderDashboard() {
     ImGui::Spacing();
   }
 
-  // Botão Principal de Ação (100% ALRI RED - Sem botões verdes, idêntico ao APK!)
+  // Botão Principal de Ação (Accent azul Perseus)
   ImVec2 btnPos = ImGui::GetCursorScreenPos();
   float btnHeight = 56.0f;
   float btnWidth = ImGui::GetContentRegionAvail().x;
@@ -390,12 +390,12 @@ void AppWindow::renderDashboard() {
     // Barra de progresso horizontal indeterminada vermelha (igual ao APK!)
     ImVec2 barMin = ImVec2(btnPos.x, btnPos.y + btnHeight + 5.0f);
     ImVec2 barMax = ImVec2(btnPos.x + btnWidth, btnPos.y + btnHeight + 9.0f);
-    DrawIndeterminateProgressBar(drawList, barMin, barMax, ImGui::GetColorU32(th.surface), ImGui::GetColorU32(th.alriRed));
+    DrawIndeterminateProgressBar(drawList, barMin, barMax, ImGui::GetColorU32(th.surface), ImGui::GetColorU32(th.accent));
     ImGui::Dummy(ImVec2(0, 10.0f));
   } else if (!m_status.isTunnelUp) {
-    ImGui::PushStyleColor(ImGuiCol_Button, th.alriRed);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.alriRedGlow);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.alriRedDark);
+    ImGui::PushStyleColor(ImGuiCol_Button, th.accent);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.accentGlow);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.accentDark);
     ImGui::PushStyleColor(ImGuiCol_Text, th.btnText);
 
     if (ImGui::Button("       ATIVAR BYPASS & ABRIR DISCORD", ImVec2(-1, btnHeight)) && !m_isWorking) {
@@ -410,7 +410,7 @@ void AppWindow::renderDashboard() {
     ImGui::PushStyleColor(ImGuiCol_Button, th.card);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.cardBorder);
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.surface);
-    ImGui::PushStyleColor(ImGuiCol_Text, th.alriRedGlow);
+    ImGui::PushStyleColor(ImGuiCol_Text, th.accentGlow);
 
     if (ImGui::Button("       DESATIVAR BYPASS & RESTAURAR REDE", ImVec2(-1, btnHeight)) && !m_isWorking) {
       triggerStop();
@@ -467,9 +467,9 @@ void AppWindow::renderConfigTab() {
     }
 
     ImGui::Spacing();
-    ImGui::PushStyleColor(ImGuiCol_Button, th.alriRed);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.alriRedGlow);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.alriRedDark);
+    ImGui::PushStyleColor(ImGuiCol_Button, th.accent);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.accentGlow);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.accentDark);
     if (ImGui::Button("  Autenticar & Gerar Perfil  ", ImVec2(220, 36)) && !m_isWorking) {
       triggerProtonLogin();
     }
@@ -527,9 +527,9 @@ void AppWindow::renderConfigTab() {
   ImGui::TextWrapped("Para apagar todas as credenciais de login salvas, remover o perfil WireGuard e restaurar o aplicativo ao estado original de fabrica:");
   ImGui::Spacing();
 
-  ImGui::PushStyleColor(ImGuiCol_Button, th.alriRed);
-  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.alriRedGlow);
-  ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.alriRedDark);
+  ImGui::PushStyleColor(ImGuiCol_Button, th.accent);
+  ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.accentGlow);
+  ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.accentDark);
   if (ImGui::Button("  LIMPAR TODAS AS CONFIGURACOES E DADOS SALVOS  ", ImVec2(370, 38)) && !m_isWorking) {
     triggerClearAll();
   }
@@ -557,7 +557,7 @@ void AppWindow::renderLogsTab() {
     ImVec4 col = th.textPrimary;
     if (entry.level == 1) col = th.terminalGreen;
     else if (entry.level == 2) col = th.terminalYellow;
-    else if (entry.level == 3) col = th.alriRed;
+    else if (entry.level == 3) col = th.accent;
 
     ImGui::TextColored(th.textMuted, "%s", entry.timeStr.c_str());
     ImGui::SameLine();
@@ -583,13 +583,13 @@ void AppWindow::renderAboutTab() {
   const ThemeColors &th = getTheme();
   ImGui::BeginChild("AboutContent", ImVec2(0, 0), true);
 
-  ImGui::TextColored(th.alriRed, "ARDiscordBypass — ALRI GROUP");
+  ImGui::TextColored(th.accent, "Perseus — made by dm24");
   ImGui::TextColored(th.textPrimary, "Versao: 3.5.0 (Desktop GUI + CLI)");
-  ImGui::TextColored(th.textMuted, "Licenca: ARGLFU Version 2 (2026)");
+  ImGui::TextColored(th.textMuted, "made by dm24");
   ImGui::Separator();
   ImGui::Spacing();
 
-  ImGui::TextWrapped("O ARDiscordBypass e uma solucao de alto desempenho desenvolvida para liberar transmissoes de tela e camera no Discord no Brasil com zero impacto em jogos e navegadores.");
+  ImGui::TextWrapped("O Perseus e uma solucao de alto desempenho desenvolvida para liberar transmissoes de tela e camera no Discord no Brasil com zero impacto em jogos e navegadores.");
   ImGui::Spacing();
 
   ImGui::BulletText("Isolamento estrito por processo (Split-Tunneling)");
@@ -603,7 +603,7 @@ void AppWindow::renderAboutTab() {
   ImGui::Spacing();
 
   if (ImGui::Button("[ REPOSITORIO GITHUB ]", ImVec2(220.0f, 36.0f))) {
-    openBrowser("https://github.com/alrigroup/ARDiscordBypass");
+    openBrowser("https://github.com/davimoreira24/discord-perseus");
   }
   ImGui::SameLine(0.0f, 10.0f);
   if (ImGui::Button("[ NOTAS DE FUNCIONAMENTO ]", ImVec2(240.0f, 36.0f))) {
@@ -635,10 +635,10 @@ void AppWindow::renderNotesModal() {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16.0f, 16.0f));
   ImGui::PushStyleColor(ImGuiCol_PopupBg, th.card);
-  ImGui::PushStyleColor(ImGuiCol_Border, th.alriRed);
+  ImGui::PushStyleColor(ImGuiCol_Border, th.accent);
 
   if (ImGui::BeginPopupModal("##NotesModal", &m_showNotesModal, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar)) {
-    ImGui::TextColored(th.alriRed, "NOTAS DE FUNCIONAMENTO");
+    ImGui::TextColored(th.accent, "NOTAS DE FUNCIONAMENTO");
     ImGui::TextColored(th.textMuted, "Entenda a arquitetura de isolamento e liberacao do Discord");
     ImGui::Separator();
     ImGui::Spacing();
@@ -649,7 +649,7 @@ void AppWindow::renderNotesModal() {
     ImGui::Spacing();
 
     ImGui::TextColored(th.terminalGreen, "1. Roteamento por Processo (Split-Tunneling):");
-    ImGui::TextWrapped("O ARDiscordBypass utiliza a tecnologia WireGuard e tecnicas de baixo nivel (Network Namespaces no Linux e Windows Filtering Platform via WireSock no Windows) para criar um tunel exclusivo apenas para os executaveis do Discord.");
+    ImGui::TextWrapped("O Perseus utiliza a tecnologia WireGuard e tecnicas de baixo nivel (Network Namespaces no Linux e Windows Filtering Platform via WireSock no Windows) para criar um tunel exclusivo apenas para os executaveis do Discord.");
     ImGui::Spacing();
 
     ImGui::TextColored(th.terminalGreen, "2. Sua Internet Fica Intocada:");
@@ -696,30 +696,26 @@ void AppWindow::renderCreditsModal() {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16.0f, 16.0f));
   ImGui::PushStyleColor(ImGuiCol_PopupBg, th.card);
-  ImGui::PushStyleColor(ImGuiCol_Border, th.alriRed);
+  ImGui::PushStyleColor(ImGuiCol_Border, th.accent);
 
   if (ImGui::BeginPopupModal("##CreditsModal", &m_showCreditsModal, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar)) {
-    ImGui::TextColored(th.alriRed, "CREDITOS & AUTOR");
-    ImGui::TextColored(th.textMuted, "ARDiscordBypass v3.5.0 — ALRI GROUP");
+    ImGui::TextColored(th.accent, "CREDITOS & AUTOR");
+    ImGui::TextColored(th.textMuted, "Perseus v3.5.0 — made by dm24");
     ImGui::Separator();
     ImGui::Spacing();
 
     ImGui::BeginChild("CreditsScroll", ImVec2(0, -48.0f), true);
 
     ImGui::TextColored(th.textPrimary, "Desenvolvimento & Autor:");
-    ImGui::TextColored(th.alriRed, "Alexsanderalri");
+    ImGui::TextColored(th.accent, "dm24");
     ImGui::Spacing();
 
-    ImGui::TextColored(th.textPrimary, "Organizacao:");
-    ImGui::TextColored(th.textSecondary, "ALRI Group (Copyright (c) 2020-2026)");
-    ImGui::Spacing();
-
-    ImGui::TextColored(th.textPrimary, "Licenca de Software:");
-    ImGui::TextColored(th.textMuted, "ARGLFU (ALRI GROUP LICENSE FREE USE) Version 2");
+    ImGui::TextColored(th.textPrimary, "Branding:");
+    ImGui::TextColored(th.textSecondary, "Perseus — made by dm24");
     ImGui::Spacing();
 
     ImGui::TextColored(th.textPrimary, "Repositorio Oficial:");
-    ImGui::TextColored(ImVec4(0.0f, 0.82f, 1.0f, 1.0f), "https://github.com/alrigroup/ARDiscordBypass");
+    ImGui::TextColored(ImVec4(0.376f, 0.647f, 0.980f, 1.0f), "https://github.com/davimoreira24/discord-perseus");
     ImGui::Spacing();
 
     ImGui::TextColored(th.textPrimary, "Protecao de Conexao:");
@@ -772,7 +768,7 @@ void AppWindow::renderLoadingOverlay() {
     drawList->AddRect(cardMin, cardMax, ImGui::GetColorU32(th.cardBorder), 12.0f, 0, 1.5f);
 
     if (m_isAuthWorking || !m_authError.empty() || m_authSuccess) {
-      // 1. Logo ALRI Animada (Pulsing Scale 1.0 -> 1.15 e Alpha 0.6 -> 1.0 com 900ms cycle, igual ao APK!)
+      // 1. Logo Perseus animada (Pulsing Scale 1.0 -> 1.15 e Alpha 0.6 -> 1.0 com 900ms cycle, igual ao APK!)
       float t = static_cast<float>(ImGui::GetTime());
       float pulsePhase = (std::sin(t * (2.0f * 3.14159265f / 0.9f)) + 1.0f) * 0.5f;
       float scale = (m_authSuccess || !m_authError.empty()) ? 1.0f : (1.0f + 0.15f * pulsePhase);
@@ -795,10 +791,10 @@ void AppWindow::renderLoadingOverlay() {
         drawList->AddCircleFilled(spinnerCenter, 13.0f, ImGui::GetColorU32(th.terminalGreen), 20);
         drawList->AddText(ImVec2(spinnerCenter.x - 5.0f, spinnerCenter.y - 7.0f), IM_COL32_BLACK, "v");
       } else if (!m_authError.empty()) {
-        drawList->AddCircleFilled(spinnerCenter, 13.0f, ImGui::GetColorU32(th.alriRed), 20);
+        drawList->AddCircleFilled(spinnerCenter, 13.0f, ImGui::GetColorU32(th.accent), 20);
         drawList->AddText(ImVec2(spinnerCenter.x - 4.0f, spinnerCenter.y - 7.0f), IM_COL32_WHITE, "x");
       } else {
-        DrawRotatingSpinner(drawList, spinnerCenter, 15.0f, 3.2f, ImGui::GetColorU32(th.alriRed));
+        DrawRotatingSpinner(drawList, spinnerCenter, 15.0f, 3.2f, ImGui::GetColorU32(th.accent));
       }
 
       // 3. Título Monospace
@@ -809,10 +805,10 @@ void AppWindow::renderLoadingOverlay() {
         titleCol = th.terminalGreen;
       } else if (!m_authError.empty()) {
         titleStr = "[ ✕ ] FALHA NA AUTENTICACAO";
-        titleCol = th.alriRed;
+        titleCol = th.accent;
       } else {
         titleStr = "AUTENTICANDO PROTONVPN";
-        titleCol = th.alriRed;
+        titleCol = th.accent;
       }
 
       ImVec2 titleSz = ImGui::CalcTextSize(titleStr.c_str());
@@ -867,12 +863,12 @@ void AppWindow::renderLoadingOverlay() {
         ImVec2 barMin = ImVec2(cardMin.x + 36.0f, cardMax.y - 28.0f);
         ImVec2 barMax = ImVec2(cardMax.x - 36.0f, cardMax.y - 22.0f);
         DrawIndeterminateProgressBar(drawList, barMin, barMax, ImGui::GetColorU32(th.surface),
-                                    m_authSuccess ? ImGui::GetColorU32(th.terminalGreen) : ImGui::GetColorU32(th.alriRed));
+                                    m_authSuccess ? ImGui::GetColorU32(th.terminalGreen) : ImGui::GetColorU32(th.accent));
       }
     } else {
       // Operação genérica em segundo plano
       ImVec2 spinnerCenter = ImVec2(center.x, cardMin.y + 50.0f);
-      DrawRotatingSpinner(drawList, spinnerCenter, 18.0f, 3.5f, ImGui::GetColorU32(th.alriRed));
+      DrawRotatingSpinner(drawList, spinnerCenter, 18.0f, 3.5f, ImGui::GetColorU32(th.accent));
 
       int dotCount = static_cast<int>(ImGui::GetTime() * 2.5) % 4;
       std::string dots = (dotCount == 1) ? "." : (dotCount == 2) ? ".." : (dotCount == 3) ? "..." : "";
@@ -889,7 +885,7 @@ void AppWindow::renderLoadingOverlay() {
 
       ImVec2 barMin = ImVec2(cardMin.x + 30.0f, cardMax.y - 28.0f);
       ImVec2 barMax = ImVec2(cardMax.x - 30.0f, cardMax.y - 20.0f);
-      DrawIndeterminateProgressBar(drawList, barMin, barMax, ImGui::GetColorU32(th.surface), ImGui::GetColorU32(th.alriRed));
+      DrawIndeterminateProgressBar(drawList, barMin, barMax, ImGui::GetColorU32(th.surface), ImGui::GetColorU32(th.accent));
     }
   }
   ImGui::End();
@@ -918,7 +914,7 @@ void AppWindow::renderSplashOverlay() {
   ImVec2 targetHeaderLogo = ImVec2(16.0f + 21.0f, 16.0f + 21.0f);
 
   if (elapsed < 1.1f) {
-    // Fase 1: Rotação suave da logo ALRI, respiração e anel giratório (Estilo Splash Android)
+    // Fase 1: Rotação suave da logo Perseus, respiração e anel giratório (Estilo Splash Android)
     drawList->AddRectFilled(ImVec2(0, 0), displaySize, IM_COL32(0, 0, 0, 255));
 
     float angle = (elapsed / 1.1f) * (2.0f * 3.14159265f);
@@ -927,7 +923,7 @@ void AppWindow::renderSplashOverlay() {
     ImVec2 hs = ImVec2(logoSize * 0.5f, logoSize * 0.5f);
 
     // Anel orbital de carregamento
-    DrawRotatingSpinner(drawList, center, 72.0f, 3.5f, ImGui::GetColorU32(th.alriRed));
+    DrawRotatingSpinner(drawList, center, 72.0f, 3.5f, ImGui::GetColorU32(th.accent));
 
     // Logo rotativa com imagem quad
     if (m_logoTexId != 0) {
@@ -940,11 +936,11 @@ void AppWindow::renderSplashOverlay() {
       drawList->AddImageQuad(static_cast<ImTextureID>(m_logoTexId), p0, p1, p2, p3, ImVec2(0, 0), ImVec2(1, 0), ImVec2(1, 1), ImVec2(0, 1), IM_COL32_WHITE);
     }
 
-    const char *title = "ARDiscordBypass v3.5.0";
+    const char *title = "Perseus v3.5.0";
     ImVec2 titleSz = ImGui::CalcTextSize(title);
-    drawList->AddText(ImVec2(center.x - titleSz.x * 0.5f, center.y + 85.0f), ImGui::GetColorU32(th.alriRed), title);
+    drawList->AddText(ImVec2(center.x - titleSz.x * 0.5f, center.y + 85.0f), ImGui::GetColorU32(th.accent), title);
 
-    const char *sub = "ALRI GROUP // INICIALIZANDO...";
+    const char *sub = "made by dm24 // INICIALIZANDO...";
     ImVec2 subSz = ImGui::CalcTextSize(sub);
     drawList->AddText(ImVec2(center.x - subSz.x * 0.5f, center.y + 110.0f), ImGui::GetColorU32(th.textSecondary), sub);
   } else {
@@ -1009,7 +1005,7 @@ void AppWindow::renderSetupModal() {
   ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 1.5f);
   ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(16.0f, 16.0f));
   ImGui::PushStyleColor(ImGuiCol_PopupBg, th.card);
-  ImGui::PushStyleColor(ImGuiCol_Border, th.alriRed);
+  ImGui::PushStyleColor(ImGuiCol_Border, th.accent);
 
   if (ImGui::BeginPopupModal("##SetupConfigModal", &m_showSetupModal, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoTitleBar)) {
     ImGui::BeginChild("SetupModalScroll", ImVec2(0, 0), false);
@@ -1021,7 +1017,7 @@ void AppWindow::renderSetupModal() {
       ImGui::SameLine(0.0f, 12.0f);
     }
     ImGui::BeginGroup();
-    ImGui::TextColored(th.alriRed, "CONFIGURACAO WIREGUARD NECESSARIA");
+    ImGui::TextColored(th.accent, "CONFIGURACAO WIREGUARD NECESSARIA");
     ImGui::TextColored(th.textMuted, "Selecione o metodo de conexao para ativar o bypass");
     ImGui::EndGroup();
     ImGui::EndGroup();
@@ -1065,9 +1061,9 @@ void AppWindow::renderSetupModal() {
     float availW = ImGui::GetContentRegionAvail().x;
     float btnW = (availW - 10.0f) * 0.5f;
 
-    ImGui::PushStyleColor(ImGuiCol_Button, th.alriRed);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.alriRedGlow);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.alriRedDark);
+    ImGui::PushStyleColor(ImGuiCol_Button, th.accent);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, th.accentGlow);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, th.accentDark);
     ImGui::PushStyleColor(ImGuiCol_Text, th.btnText);
 
     if (ImGui::Button("1. ENTRAR & ATIVAR BYPASS", ImVec2(btnW, 36.0f)) && !m_isWorking) {

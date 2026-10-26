@@ -25,10 +25,13 @@ inline const char *DIM         = "\033[2m";
 inline const char *ITALIC      = "\033[3m";
 inline const char *UNDERLINE   = "\033[4m";
 
-// Cores ALRI e Modern Terminal (Vermelho puro e marcante #E50914)
-inline const char *RED         = "\033[38;2;229;9;20m";
-inline const char *RED_BRIGHT  = "\033[38;2;255;30;39m";
-inline const char *RED_DARK    = "\033[38;2;178;7;16m";
+// Cores Perseus (azul #3B82F6) + terminal moderno
+inline const char *RED         = "\033[38;2;59;130;246m";   // accent blue (compat)
+inline const char *RED_BRIGHT  = "\033[38;2;96;165;250m";  // accent glow
+inline const char *RED_DARK    = "\033[38;2;37;99;235m";   // accent dark
+inline const char *BLUE        = "\033[38;2;59;130;246m";
+inline const char *BLUE_BRIGHT = "\033[38;2;96;165;250m";
+inline const char *BLUE_DARK   = "\033[38;2;37;99;235m";
 inline const char *GREEN       = "\033[38;2;0;230;118m";
 inline const char *YELLOW      = "\033[38;2;255;214;0m";
 inline const char *CYAN        = "\033[38;2;0;212;255m";

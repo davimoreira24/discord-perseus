@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.16)
-project(ARDiscordBypass CXX)
+project(Perseus CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# --- Alvo 1: ARDiscordBypass (CLI Padrão - Leve) ---
+# --- Alvo 1: Perseus (CLI Padrão - Leve) ---
 if (WIN32)
 	add_custom_command(
 		OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/proton_confgen_embed.o
@@ -23,17 +23,17 @@ else()
 	)
 endif()
 
-add_executable(ARDiscordBypass main.cpp ${CMAKE_CURRENT_BINARY_DIR}/proton_confgen_embed.o)
-target_include_directories(ARDiscordBypass PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+add_executable(Perseus main.cpp ${CMAKE_CURRENT_BINARY_DIR}/proton_confgen_embed.o)
+target_include_directories(Perseus PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (WIN32)
-	target_link_libraries(ARDiscordBypass PRIVATE ws2_32 winhttp)
+	target_link_libraries(Perseus PRIVATE ws2_32 winhttp)
 else()
-	target_compile_definitions(ARDiscordBypass PRIVATE _POSIX_C_SOURCE=200809L)
-	target_link_options(ARDiscordBypass PRIVATE -static-libgcc -static-libstdc++)
+	target_compile_definitions(Perseus PRIVATE _POSIX_C_SOURCE=200809L)
+	target_link_options(Perseus PRIVATE -static-libgcc -static-libstdc++)
 endif()
 
-# --- Alvo 2: ARDiscordBypass_gui (GUI Opcional - Dear ImGui) ---
+# --- Alvo 2: Perseus_gui (GUI Opcional - Dear ImGui) ---
 option(BUILD_GUI "Build the optional Graphical User Interface (Dear ImGui)" OFF)
 
 if (BUILD_GUI)
@@ -49,19 +49,19 @@ if (BUILD_GUI)
 
 	if (WIN32)
 		list(APPEND GUI_SOURCES gui/vendor/imgui/backends/imgui_impl_win32.cpp)
-		add_executable(ARDiscordBypass_gui WIN32 ${GUI_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/proton_confgen_embed.o)
-		target_include_directories(ARDiscordBypass_gui PRIVATE 
+		add_executable(Perseus_gui WIN32 ${GUI_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/proton_confgen_embed.o)
+		target_include_directories(Perseus_gui PRIVATE 
 			${CMAKE_CURRENT_SOURCE_DIR}
 			${CMAKE_CURRENT_SOURCE_DIR}/gui
 			${CMAKE_CURRENT_SOURCE_DIR}/gui/vendor/imgui
 		)
-		target_link_libraries(ARDiscordBypass_gui PRIVATE 
+		target_link_libraries(Perseus_gui PRIVATE 
 			opengl32 gdi32 user32 comdlg32 dwmapi imm32 ws2_32 winhttp
 		)
 	else()
 		list(APPEND GUI_SOURCES gui/vendor/imgui/backends/imgui_impl_glfw.cpp)
-		add_executable(ARDiscordBypass_gui ${GUI_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/proton_confgen_embed.o)
-		target_include_directories(ARDiscordBypass_gui PRIVATE 
+		add_executable(Perseus_gui ${GUI_SOURCES} ${CMAKE_CURRENT_BINARY_DIR}/proton_confgen_embed.o)
+		target_include_directories(Perseus_gui PRIVATE 
 			${CMAKE_CURRENT_SOURCE_DIR}
 			${CMAKE_CURRENT_SOURCE_DIR}/gui
 			${CMAKE_CURRENT_SOURCE_DIR}/gui/vendor/imgui
@@ -70,10 +70,10 @@ if (BUILD_GUI)
 		pkg_check_modules(GLFW REQUIRED glfw3)
 		find_package(OpenGL REQUIRED)
 
-		target_link_libraries(ARDiscordBypass_gui PRIVATE 
+		target_link_libraries(Perseus_gui PRIVATE 
 			${GLFW_LIBRARIES} OpenGL::GL dl pthread
 		)
-		target_include_directories(ARDiscordBypass_gui PRIVATE ${GLFW_INCLUDE_DIRS})
-		target_link_options(ARDiscordBypass_gui PRIVATE -static-libgcc -static-libstdc++)
+		target_include_directories(Perseus_gui PRIVATE ${GLFW_INCLUDE_DIRS})
+		target_link_options(Perseus_gui PRIVATE -static-libgcc -static-libstdc++)
 	endif()
 endif()

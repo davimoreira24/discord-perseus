@@ -1,7 +1,7 @@
-# 📚 Documentação Técnica — ARDiscordBypass v3.5.0
+# 📚 Documentação Técnica — Perseus v3.5.0
 
 > **Documentação de Engenharia de Sistemas, Arquitetura e Protocolos de Rede**  
-> **ALRI GROUP (ALRI Technology Ecosystem)** — Versão 3.5.0 (2026)
+> **Perseus — made by dm24** — Versão 3.5.0 (2026)
 
 ---
 
@@ -36,7 +36,7 @@
 
 ## 1. Visão Geral & Arquitetura do Sistema
 
-O **ARDiscordBypass v3.5.0** foi concebido para contornar instabilidades e bloqueios de infraestrutura de mídia RTC (WebRTC) e transmissões de tela/vídeo do Discord no território brasileiro, sem afetar o tráfego global da máquina e sem necessitar de VPN de sistema integral.
+O **Perseus v3.5.0** foi concebido para contornar instabilidades e bloqueios de infraestrutura de mídia RTC (WebRTC) e transmissões de tela/vídeo do Discord no território brasileiro, sem afetar o tráfego global da máquina e sem necessitar de VPN de sistema integral.
 
 ```
                               [ Aplicações do Sistema ]
@@ -51,7 +51,7 @@ O **ARDiscordBypass v3.5.0** foi concebido para contornar instabilidades e bloqu
                    │                     │
                    ▼ (Roteamento Seletivo)│
       ┌─────────────────────────┐        │
-      │ ARDiscordBypass Engine  │────────┘ (Split-Tunneling Estrito)
+      │ Perseus Engine  │────────┘ (Split-Tunneling Estrito)
       │  (WireGuard Isolated)   │
       └────────────┬────────────┘
                    │
@@ -69,16 +69,16 @@ O **ARDiscordBypass v3.5.0** foi concebido para contornar instabilidades e bloqu
 O projeto é estruturado em domínios isolados por plataforma com código 100% aberto:
 
 ```
-ARDiscordBypass/
+Perseus/
 ├── DOCS.md                     # Esta documentação técnica de engenharia
 ├── README.md                   # Apresentação do projeto e guia do usuário
 ├── LICENSE                     # Termos da licença ARGLFU v2
-├── logo.png                    # Identidade visual oficial ALRI
-├── ARDiscordBypass_linux       # Executável CLI Linux x86_64 (Single Standalone com gerador embutido)
-├── ARDiscordBypass_gui_linux   # Executável GUI Desktop Linux com CLI embutido e Dear ImGui
-├── ARDiscordBypass.exe         # Executável CLI Windows x64 (Single Standalone com gerador embutido)
-├── ARDiscordBypass_gui.exe     # Executável GUI Desktop Windows com CLI embutido e Dear ImGui
-├── ARDiscordBypass.apk         # Aplicativo Android compilado
+├── logo.png                    # Identidade visual Perseus
+├── Perseus_linux       # Executável CLI Linux x86_64 (Single Standalone com gerador embutido)
+├── Perseus_gui_linux   # Executável GUI Desktop Linux com CLI embutido e Dear ImGui
+├── Perseus.exe         # Executável CLI Windows x64 (Single Standalone com gerador embutido)
+├── Perseus_gui.exe     # Executável GUI Desktop Windows com CLI embutido e Dear ImGui
+├── Perseus.apk         # Aplicativo Android compilado
 │
 ├── PC/                         # Solução Desktop em C++20 Nativo
 │   ├── CMakeLists.txt          # Configuração CMake do módulo PC (com regras objcopy de embedding)
@@ -96,7 +96,7 @@ ARDiscordBypass/
 │   │   ├── app_window.cpp      # Janela principal, modais de setup, notas e créditos
 │   │   ├── app_window.h        # Cabeçalho da aplicação GUI
 │   │   ├── widgets.h           # Componentes visuais personalizados
-│   │   └── style.h             # Paleta de cores ALRI Red e temas
+│   │   └── style.h             # Paleta de cores azul Perseus e temas
 │   └── os/
 │       ├── linux/platform.h    # Namespaces (`netns`), auto-extração (~/.local/share) e WireGuard
 │       └── windows/platform.h  # CreateProcessW nativo, auto-extração (%LOCALAPPDATA%) e WFP WireSock
@@ -136,7 +136,7 @@ ARDiscordBypass/
 
 ### 3.1 Linux — Network Namespace (`netns`) & WireGuard
 
-No Linux, a técnica padrão de VPN altera a tabela de roteamento da máquina (`ip route replace default`), afetando todos os programas abertos. O ARDiscordBypass utiliza a funcionalidade de **Network Namespaces** do kernel Linux (`ip netns`):
+No Linux, a técnica padrão de VPN altera a tabela de roteamento da máquina (`ip route replace default`), afetando todos os programas abertos. O Perseus utiliza a funcionalidade de **Network Namespaces** do kernel Linux (`ip netns`):
 
 1. **Criação do Namespace Isolado**:
    Um namespace chamado `ar-discord-vpn` é criado via `ip netns add ar-discord-vpn`.
@@ -173,7 +173,7 @@ No Windows, namespaces de rede não existem no mesmo formato do Linux. A soluç�
 3. **Execução Segura de Subprocessos via Win32 API (`CreateProcessW` vs `_popen`)**:
    - **Vulnerabilidade do `_popen` Clássico**: A função tradicional `_popen` repassa a linha de comando para o interpretador de lote `cmd.exe /c "..."`. O `cmd.exe` possui regras complexas de manipulação de aspas duplas, removendo aspas externas quando detecta múltiplos argumentos citados (quebrando caminhos com espaços como `C:\Program Files\...`). Adicionalmente, caracteres especiais em senhas fortes (tais como `&`, `%`, `^`, `<`, `>`, `|`) são interpretados como operadores de redirecionamento ou variáveis de ambiente pelo shell, corrompendo a autenticação SRP.
    - **Solução Nativa Robusta (`CreateProcessW` + Anonymous Pipes)**:
-     O ARDiscordBypass substituiu totalmente chamadas de shell por invocação direta de processo através de `CreateProcessW`:
+     O Perseus substituiu totalmente chamadas de shell por invocação direta de processo através de `CreateProcessW`:
      - Argumentos formatados com escape seguro de aspas duplas.
      - Criação de canais anônimos unidirecionais (`CreatePipe`) com atributo de segurança `bInheritHandle = TRUE` para capturar `stdout` e `stderr`.
      - Flag `CREATE_NO_WINDOW`, eliminando qualquer piscada indesejada de janela preta do console para o usuário final.
@@ -201,11 +201,11 @@ O ponto de entrada `PC/main.cpp` processa argumentos de linha de comando:
 A variante gráfica opcional (`PC/gui/`) fornece uma experiência visual moderna e reativa, compartilhando o mesmo Design System do aplicativo Android:
 
 - **Unificação Visual (Light / Dark Mode idêntico ao Android)**:
-  - **Dark Mode**: Fundo 100% OLED Pure Black (`#000000`), superfície `#0A0A0A`, cards `#121212`, bordas `#242424` e realce em Vermelho ALRI (`#E50914`).
+  - **Dark Mode**: Fundo 100% OLED Pure Black (`#000000`), superfície `#0A0A0A`, cards `#121212`, bordas `#242424` e realce em Azul Perseus (`#3B82F6`).
   - **Light Mode**: Superfície clara `#F8FAFC`, cards `#F1F5F9`, bordas `#E2E8F0` e tipografia de alto contraste `#0F172A`.
   - Botão de alternância instantânea no cabeçalho com ícones procedurais de sol/lua.
 - **Logo Oficial Incorporada na Compilação**:
-  - A imagem da logo ALRI (`logo.png`) é convertida em array binário C (`logo_data.h`) e compilada diretamente no executável. O carregamento ocorre via `stb_image` para textura RGBA OpenGL em memória, tornando o executável 100% autocontido (independente de arquivos externos na pasta).
+  - A imagem da logo Perseus (`logo.png`) é convertida em array binário C (`logo_data.h`) e compilada diretamente no executável. O carregamento ocorre via `stb_image` para textura RGBA OpenGL em memória, tornando o executável 100% autocontido (independente de arquivos externos na pasta).
 - **Ícones Vetoriais Procedurais (Zero Glifos Corrompidos `?`)**:
   - Eliminação de dependência de emojis de fontes UTF-8 externas que causavam pontos de interrogação no Linux. Os ícones (Play, Stop, Sol, Lua, Check, Status) são desenhados diretamente pelo motor vetorial `ImDrawList`.
 - **Animações Fluidas de Loading & Status**:
@@ -223,7 +223,7 @@ A variante gráfica opcional (`PC/gui/`) fornece uma experiência visual moderna
 
 Em versões legadas e ferramentas convencionais de split-tunneling, a distribuição exigia múltiplos arquivos soltos em pastas relativas (como `bin/wiresock-client.exe`, `bin/proton-confgen.exe`, scripts `.bat` e arquivos de apoio). Caso o usuário final baixasse apenas o executável avulso em sua pasta `Downloads` ou o movesse para a Área de Trabalho, o programa falhava instantaneamente por caminhos relativos quebrados.
 
-O **ARDiscordBypass v3.5.0** implementa o padrão **Single Standalone Executable**:
+O **Perseus v3.5.0** implementa o padrão **Single Standalone Executable**:
 
 1. **Linkagem de Objeto Binário Bruto (`objcopy`)**:
    Durante a fase de compilação, o utilitário completo de geração de chaves e autenticação Proton é convertido diretamente em um arquivo objeto compilável:
@@ -250,12 +250,12 @@ O **ARDiscordBypass v3.5.0** implementa o padrão **Single Standalone Executable
 2. **Auto-Extração Atômica em Tempo de Execução (`ensureProtonConfgenAvailable`)**:
    Na primeira chamada da camada de serviço (`loginProton` ou verificação de chaves):
    - O aplicativo localiza a pasta padrão de dados de aplicativos do sistema:
-     - **Windows**: `%LOCALAPPDATA%\ARDiscordBypass\proton-confgen.exe`
-     - **Linux**: `~/.local/share/ARDiscordBypass/proton-confgen`
+     - **Windows**: `%LOCALAPPDATA%\Perseus\proton-confgen.exe`
+     - **Linux**: `~/.local/share/Perseus/proton-confgen`
    - Se o utilitário já existir e seu tamanho for íntegro (> 1 MB), a extração é ignorada, prosseguindo com execução imediata.
    - Caso não exista, o diretório é criado automaticamente (`CreateDirectoryW` / `mkdir -p`), o payload bruto embutido em memória de leitura (`.rodata`) é gravado em disco de forma atômica e as permissões de execução adequadas (`chmod 0755` no Linux) são atribuídas.
 3. **Independência Operacional**:
-   O usuário pode colocar o `ARDiscordBypass.exe` ou `ARDiscordBypass_gui.exe` em qualquer diretório arbitrário, pen-drive ou pasta compartilhada sem necessidade de instalar pastas acessórias ou configuradores externos.
+   O usuário pode colocar o `Perseus.exe` ou `Perseus_gui.exe` em qualquer diretório arbitrário, pen-drive ou pasta compartilhada sem necessidade de instalar pastas acessórias ou configuradores externos.
 
 ### 3.7 Handshake SRP, Normalização de Credenciais & Mapeamento de Erros
 
@@ -323,8 +323,8 @@ Apenas o tráfego originado por esses UIDs é capturado pela interface `tun0`.
 
 ### 4.3 Quick Settings Tile & Atualizador Assíncrono
 
-- **Quick Settings Tile**: Usuários com Android 7.0+ podem adicionar o botão rápido do ARDiscordBypass na central de notificações, ligando ou desligando o túnel com um toque sem abrir a interface.
-- **UpdateChecker**: Validação assíncrona contra a API REST do GitHub Releases (`https://api.github.com/repos/alrigroup/ARDiscordBypass/releases/latest`), notificando o usuário sem travar a thread de interface.
+- **Quick Settings Tile**: Usuários com Android 7.0+ podem adicionar o botão rápido do Perseus na central de notificações, ligando ou desligando o túnel com um toque sem abrir a interface.
+- **UpdateChecker**: Validação assíncrona contra a API REST do GitHub Releases (`https://api.github.com/repos/davimoreira24/discord-perseus/releases/latest`), notificando o usuário sem travar a thread de interface.
 
 ### 4.4 Autenticação Proton In-App via Biblioteca Nativa (`libprotonconfgen.so`) — 100% Open-Source
 
@@ -413,7 +413,7 @@ O script `build.sh` e o `CMakeLists.txt` cuidam automaticamente de converter o b
 cd PC
 chmod +x build.sh
 ./build.sh
-# Gera: ../ARDiscordBypass_linux (~13 MB com motor Proton 100% embutido)
+# Gera: ../Perseus_linux (~13 MB com motor Proton 100% embutido)
 ```
 
 **Modo Completo (CLI + GUI juntas):**
@@ -421,8 +421,8 @@ chmod +x build.sh
 cd PC
 ./build.sh --gui
 # Gera:
-#   ../ARDiscordBypass_linux      (~13 MB - Single Executable CLI)
-#   ../ARDiscordBypass_gui_linux  (~14 MB - Single Executable GUI Dear ImGui)
+#   ../Perseus_linux      (~13 MB - Single Executable CLI)
+#   ../Perseus_gui_linux  (~14 MB - Single Executable GUI Dear ImGui)
 ```
 
 Ou manualmente pelo CMake:
@@ -443,17 +443,17 @@ x86_64-w64-mingw32-objcopy -I binary -O pe-x86-64 -B i386:x86-64 proton-confgen.
 cd ..
 ```
 
-**Passo 2: Compilar a CLI (`ARDiscordBypass.exe`):**
+**Passo 2: Compilar a CLI (`Perseus.exe`):**
 ```bash
 x86_64-w64-mingw32-g++ -std=c++20 -O3 \
   -static -static-libgcc -static-libstdc++ \
   -I. main.cpp proton_confgen_embed.o \
-  -o ../ARDiscordBypass.exe \
+  -o ../Perseus.exe \
   -lws2_32 -lwinhttp
-x86_64-w64-mingw32-strip ../ARDiscordBypass.exe
+x86_64-w64-mingw32-strip ../Perseus.exe
 ```
 
-**Passo 3: Compilar a GUI (`ARDiscordBypass_gui.exe`):**
+**Passo 3: Compilar a GUI (`Perseus_gui.exe`):**
 ```bash
 x86_64-w64-mingw32-g++ -std=c++20 -O3 \
   -static -static-libgcc -static-libstdc++ \
@@ -464,8 +464,8 @@ x86_64-w64-mingw32-g++ -std=c++20 -O3 \
   gui/vendor/imgui/backends/imgui_impl_opengl3.cpp \
   -I . -I gui -I gui/vendor/imgui \
   -lopengl32 -lgdi32 -luser32 -lcomdlg32 -lshell32 -ldwmapi -limm32 -lws2_32 -lwinhttp \
-  -mwindows -o ../ARDiscordBypass_gui.exe
-x86_64-w64-mingw32-strip ../ARDiscordBypass_gui.exe
+  -mwindows -o ../Perseus_gui.exe
+x86_64-w64-mingw32-strip ../Perseus_gui.exe
 ```
 
 *(No Windows, você pode simplesmente abrir o Prompt de Comando na pasta `PC` e executar `build.bat` ou `build.bat --gui` para compilar tudo automaticamente).*
@@ -520,11 +520,11 @@ readelf -h libprotonconfgen.so
 
 | Plataforma | Edição | Binário | Status VirusTotal | Hash SHA-256 Oficial |
 | :--- | :---: | :--- | :---: | :--- |
-| **Android** | Mobile | `ARDiscordBypass.apk` | [**0/75 Detections (100% Limpo)**](https://www.virustotal.com/gui/file/3b4891d8e91de6689b1523c59e2aa8f291e8b40363c69efdb89a70668682db2c?nocache=1) | `3b4891d8e91de6689b1523c59e2aa8f291e8b40363c69efdb89a70668682db2c` |
-| **Linux (x86_64)** | CLI | `ARDiscordBypass_linux` | [**0/75 Detections (100% Limpo)**](https://www.virustotal.com/gui/file/c1675e9cbadda07ba2e7535981bd80e942bfd0c46796fcd35d980dd2860761f1?nocache=1) | `c1675e9cbadda07ba2e7535981bd80e942bfd0c46796fcd35d980dd2860761f1` |
-| **Linux (x86_64)** | GUI | `ARDiscordBypass_gui_linux` | [**0/75 Detections (100% Limpo)**](https://www.virustotal.com/gui/file/6e6cb8b1e5815ef4faefd02a5b75502fa85ca81e0b81d3c480e2949bf3bfea8e?nocache=1) | `6e6cb8b1e5815ef4faefd02a5b75502fa85ca81e0b81d3c480e2949bf3bfea8e` |
-| **Windows (x64)** | CLI | `ARDiscordBypass.exe` | [**4/75 Detections (Falso Positivo)**](https://www.virustotal.com/gui/file/df9983198147fb850b473ecd58f84fac72059eb9e75c54e31801c25ed1c7cecd?nocache=1) | `df9983198147fb850b473ecd58f84fac72059eb9e75c54e31801c25ed1c7cecd` |
-| **Windows (x64)** | GUI | `ARDiscordBypass_gui.exe` | [**3/75 Detections (Falso Positivo)**](https://www.virustotal.com/gui/file/0907e8d7e9ea1927fc6e5cfd35b59169d2cafe23f3a60832430031690e4468fa?nocache=1) | `0907e8d7e9ea1927fc6e5cfd35b59169d2cafe23f3a60832430031690e4468fa` |
+| **Android** | Mobile | `Perseus.apk` | [**0/75 Detections (100% Limpo)**](https://www.virustotal.com/gui/file/3b4891d8e91de6689b1523c59e2aa8f291e8b40363c69efdb89a70668682db2c?nocache=1) | `3b4891d8e91de6689b1523c59e2aa8f291e8b40363c69efdb89a70668682db2c` |
+| **Linux (x86_64)** | CLI | `Perseus_linux` | [**0/75 Detections (100% Limpo)**](https://www.virustotal.com/gui/file/c1675e9cbadda07ba2e7535981bd80e942bfd0c46796fcd35d980dd2860761f1?nocache=1) | `c1675e9cbadda07ba2e7535981bd80e942bfd0c46796fcd35d980dd2860761f1` |
+| **Linux (x86_64)** | GUI | `Perseus_gui_linux` | [**0/75 Detections (100% Limpo)**](https://www.virustotal.com/gui/file/6e6cb8b1e5815ef4faefd02a5b75502fa85ca81e0b81d3c480e2949bf3bfea8e?nocache=1) | `6e6cb8b1e5815ef4faefd02a5b75502fa85ca81e0b81d3c480e2949bf3bfea8e` |
+| **Windows (x64)** | CLI | `Perseus.exe` | [**4/75 Detections (Falso Positivo)**](https://www.virustotal.com/gui/file/df9983198147fb850b473ecd58f84fac72059eb9e75c54e31801c25ed1c7cecd?nocache=1) | `df9983198147fb850b473ecd58f84fac72059eb9e75c54e31801c25ed1c7cecd` |
+| **Windows (x64)** | GUI | `Perseus_gui.exe` | [**3/75 Detections (Falso Positivo)**](https://www.virustotal.com/gui/file/0907e8d7e9ea1927fc6e5cfd35b59169d2cafe23f3a60832430031690e4468fa?nocache=1) | `0907e8d7e9ea1927fc6e5cfd35b59169d2cafe23f3a60832430031690e4468fa` |
 
 5. **Análise Técnica dos Falsos Positivos no Windows**:
    - **Binário Autocontido (Payload PE embutido via `objcopy`)**: O executável embute o arquivo PE completo do utilitário `proton-confgen.exe` e o extrai dinamicamente para `%LOCALAPPDATA%`. Antivírus heurísticos de segunda linha frequentemente sinalizam executáveis que gravam e iniciam outros arquivos `.exe` em pastas do usuário.
@@ -536,9 +536,9 @@ readelf -h libprotonconfgen.so
 
 ## 8. Licença & Termos de Uso
 
-Este projeto é protegido sob os termos da **ARGLFU (ALRI GROUP LICENSE FREE USE) Version 2 – 2026**.
+Este projeto é protegido sob os termos da **ARGLFU (dm24 LICENSE FREE USE) Version 2 – 2026**.
 
 - Permitido o uso pessoal, gratuito e redistribuição na forma original.
 - Proibida a engenharia reversa para fins comerciais ou monetização deste software.
 
-**ALRI GROUP** — *Inovação, Segurança e Performance.*
+**dm24** — *Inovação, Segurança e Performance.*

@@ -310,7 +310,7 @@ inline std::string extractEmbeddedProtonConfgenLinux() {
   if (size == 0) return "";
 
   const char *home = std::getenv("HOME");
-  std::string targetDir = home ? (std::string(home) + "/.local/share/ARDiscordBypass") : "/tmp/ARDiscordBypass";
+  std::string targetDir = home ? (std::string(home) + "/.local/share/Perseus") : "/tmp/Perseus";
 
   std::error_code ec;
   fs::create_directories(targetDir, ec);

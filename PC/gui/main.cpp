@@ -102,12 +102,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) {
   WNDCLASSEXW wc = {
       sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, hInstance,
       LoadIcon(NULL, IDI_APPLICATION), LoadCursor(NULL, IDC_ARROW),
-      NULL, NULL, L"ARDiscordBypassGUI", NULL
+      NULL, NULL, L"PerseusGUI", NULL
   };
   RegisterClassExW(&wc);
 
   HWND hwnd = CreateWindowW(
-      wc.lpszClassName, L"ARDiscordBypass v3.5.0 — ALRI GROUP",
+      wc.lpszClassName, L"Perseus v3.5.0 — made by dm24",
       WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
       100, 100, 740, 580, NULL, NULL, wc.hInstance, NULL
   );
@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-  GLFWwindow *window = glfwCreateWindow(740, 580, "ARDiscordBypass v3.5.0 — ALRI GROUP", nullptr, nullptr);
+  GLFWwindow *window = glfwCreateWindow(740, 580, "Perseus v3.5.0 — made by dm24", nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     std::fprintf(stderr, "Não foi possível criar a janela gráfica. Executando em modo CLI de fallback...\n");

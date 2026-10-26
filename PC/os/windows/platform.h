@@ -288,11 +288,11 @@ inline std::wstring extractEmbeddedProtonConfgenExe() {
   wchar_t localApp[MAX_PATH];
   std::wstring targetDir = L"";
   if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
-    targetDir = std::wstring(localApp) + L"\\ARDiscordBypass";
+    targetDir = std::wstring(localApp) + L"\\Perseus";
   } else {
     wchar_t userProfile[MAX_PATH];
     if (GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH) != 0) {
-      targetDir = std::wstring(userProfile) + L"\\ARDiscordBypass";
+      targetDir = std::wstring(userProfile) + L"\\Perseus";
     }
   }
   if (targetDir.empty()) return L"";
@@ -329,13 +329,13 @@ inline std::wstring findProtonConfgenExe() {
 
   wchar_t userProfile[MAX_PATH];
   if (GetEnvironmentVariableW(L"USERPROFILE", userProfile, MAX_PATH) != 0) {
-    candidates.push_back(std::wstring(userProfile) + L"\\ARDiscordBypass\\proton-confgen.exe");
+    candidates.push_back(std::wstring(userProfile) + L"\\Perseus\\proton-confgen.exe");
     candidates.push_back(std::wstring(userProfile) + L"\\Documents\\proton-confgen.exe");
   }
 
   wchar_t localApp[MAX_PATH];
   if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
-    candidates.push_back(std::wstring(localApp) + L"\\ARDiscordBypass\\proton-confgen.exe");
+    candidates.push_back(std::wstring(localApp) + L"\\Perseus\\proton-confgen.exe");
   }
 
   for (const auto &cand : candidates) {
@@ -361,7 +361,7 @@ inline std::string getVpnConfigPath() {
   }
   wchar_t localApp[MAX_PATH];
   if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
-    fs::path localConf = fs::path(localApp) / "ARDiscordBypass" / "ardc_vpn.conf";
+    fs::path localConf = fs::path(localApp) / "Perseus" / "ardc_vpn.conf";
     if (fs::is_regular_file(localConf)) return localConf.string();
   }
   if (GetModuleFileNameW(nullptr, modulePath, MAX_PATH) != 0) {
@@ -377,7 +377,7 @@ inline std::string getVpnConfigPath() {
     } catch (...) {}
   }
   if (GetEnvironmentVariableW(L"LOCALAPPDATA", localApp, MAX_PATH) != 0) {
-    fs::path dir = fs::path(localApp) / "ARDiscordBypass";
+    fs::path dir = fs::path(localApp) / "Perseus";
     std::error_code ec;
     fs::create_directories(dir, ec);
     return (dir / "ardc_vpn.conf").string();
